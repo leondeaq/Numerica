@@ -38,8 +38,14 @@ function confirmarSalida() {
   }
 }
 
-// 4. Ejecución del Método de Newton-Raphson mediante WebAssembly (C++)
+// 4. Ejecución del Método de Newton-Raphson 100% con WebAssembly (C++ / Embind)
 function ejecutarNewton() {
+  // Verificar que el módulo C++ esté cargado
+  if (typeof Module === 'undefined' || typeof Module.calcular_newton_cpp !== 'function') {
+    alert("Cargando módulo de C++...");
+    return;
+  }
+
   const funcionStr = document.getElementById('inputFuncion').value.trim();
   const x0 = parseFloat(document.getElementById('inputX0').value);
   const tol = parseFloat(document.getElementById('inputTol').value);
@@ -54,18 +60,11 @@ function ejecutarNewton() {
   cuerpoTabla.innerHTML = '';
   cardResultados.style.display = 'block';
 
-  try {
-    let res;
+  let res = null;
 
-    // Verificar si el módulo C++ (Emscripten) está disponible globalmente
-    if (typeof Module !== 'undefined' && typeof Module.calcular_newton_cpp === 'function') {
-      // Llamada directa al código compilado C++
-      res = Module.calcular_newton_cpp(funcionStr, x0, tol, maxIter);
-    } else {
-      // Fallback en JavaScript en caso de que aún no se haya cargado core.js/core.wasm
-      console.warn("Módulo WebAssembly C++ cargando o no detectado. Utilizando motor fallback.");
-      res = ejecutarNewtonFallbackJS(funcionStr, x0, tol, maxIter);
-    }
+  try {
+    // Llamada directa al código compilado C++
+    res = Module.calcular_newton_cpp(funcionStr, x0, tol, maxIter);
 
     if (!res.exito) {
       alertaError.innerText = res.error_msg || "Error al procesar el método.";
@@ -79,15 +78,13 @@ function ejecutarNewton() {
     document.getElementById('valRaiz').innerText = Number(res.raiz).toFixed(6);
     document.getElementById('valIteraciones').innerText = res.iteraciones;
 
-    // Poblar la tabla de iteraciones
+    // Poblar la tabla desde el std::vector<FilaIteracion> (VectorFilas)
     let htmlFilas = '';
-    
-    // Obtener array de iteraciones (funciona tanto para std::vector embebido en Embind como para arrays en JS)
-    const totalFilas = typeof res.tabla.size === 'function' ? res.tabla.size() : res.tabla.length;
+    const totalFilas = res.tabla.size();
 
     for (let i = 0; i < totalFilas; i++) {
-      const fila = typeof res.tabla.get === 'function' ? res.tabla.get(i) : res.tabla[i];
-      
+      const fila = res.tabla.get(i);
+
       htmlFilas += `
         <tr>
           <td>${fila.k}</td>
@@ -102,56 +99,12 @@ function ejecutarNewton() {
     cuerpoTabla.innerHTML = htmlFilas;
 
   } catch (err) {
-    alertaError.innerText = "Error inesperado al ejecutar el algoritmo: " + err.message;
+    alertaError.innerText = "Error inesperado al ejecutar el algoritmo: " + (err && err.message ? err.message : err);
     alertaError.style.display = 'block';
-  }
-}
-
-/**
- * Motor Fallback en JS para evaluación previa mientras se compila el ejecutable C++.
- */
-function ejecutarNewtonFallbackJS(exprStr, x0, tol, maxIter) {
-  // Evaluador básico de funciones comunes
-  function f(x) {
-    // Reemplazos simples de notación matemática a Math.js
-    let parsed = exprStr
-      .replace(/x/g, `(${x})`)
-      .replace(/\^/g, '**')
-      .replace(/sin/g, 'Math.sin')
-      .replace(/cos/g, 'Math.cos')
-      .replace(/sqrt/g, 'Math.sqrt')
-      .replace(/exp/g, 'Math.exp');
-    return Function(`"use strict"; return (${parsed})`)();
-  }
-
-  // Diferencia finita centrada para derivada
-  const h = 1e-7;
-  function df(x) {
-    return (f(x + h) - f(x - h)) / (2 * h);
-  }
-
-  let xk = x0;
-  let tabla = [];
-
-  for (let k = 1; k <= maxIter; k++) {
-    let f_xk = f(xk);
-    let df_xk = df(xk);
-
-    if (Math.abs(df_xk) < 1e-12) {
-      return { exito: false, error_msg: "La derivada f'(x) es cercana a cero." };
+  } finally {
+    // Liberar la memoria del vector de C++
+    if (res && res.tabla && typeof res.tabla.delete === 'function') {
+      res.tabla.delete();
     }
-
-    let x_next = xk - (f_xk / df_xk);
-    let error = Math.abs(x_next) > 1e-12 ? Math.abs((x_next - xk) / x_next) : Math.abs(x_next - xk);
-
-    tabla.push({ k: k, xk: xk, f_xk: f_xk, df_xk: df_xk, error: error });
-
-    if (error < tol) {
-      return { exito: true, raiz: x_next, iteraciones: k, tabla: tabla };
-    }
-
-    xk = x_next;
   }
-
-  return { exito: true, raiz: xk, iteraciones: maxIter, tabla: tabla };
 }
