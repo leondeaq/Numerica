@@ -1,1 +1,35 @@
-
+name: Compilar C++ a WebAssembly y Publicar en GitHub Pages
+on:
+  push:
+    branches:
+      - main                  # Se dispara al subir cambios a la rama principal
+    paths:
+      - 'core.cpp'            # Se activa si cambia la logica de C++
+      - 'index.html'
+      - 'style.css'
+      - 'script.js'
+permissions:
+  contents: write             # Otorga permisos de escritura para publicar en gh-pages
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Obtener el codigo fuente del repositorio
+      - name: Descargar codigo fuente
+        uses: actions/checkout@v4
+      # 2. Instalar y configurar el entorno de Emscripten (SDK de compilacion C++)
+      - name: Configurar Emscripten SDK
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.50
+          actions-cache-folder: 'emsdk-cache'
+      # 3. Compilar core.cpp a binarios WebAssembly (core.js y core.wasm)
+      - name: Compilar C++ con emcc
+        run: |
+          emcc -O3 --bind core.cpp -o core.js -s WASM=1 -s ALLOW_MEMORY_GROWTH=1
+      # 4. Desplegar los archivos compilados en la rama de GitHub Pages
+      - name: Desplegar en GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
