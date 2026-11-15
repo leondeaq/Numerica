@@ -6,6 +6,14 @@
   <title>Numérica - Calculadora de Métodos Numéricos</title>
   <link rel="stylesheet" href="style.css">
   <!-- Carga del WebAssembly compilado por Emscripten -->
+  <script>
+    // Configuración del módulo Emscripten (debe definirse ANTES de core.js)
+    var Module = {
+      onRuntimeInitialized: function () {
+        console.log("Módulo WebAssembly (C++) listo.");
+      }
+    };
+  </script>
   <script src="core.js" defer></script>
   <script src="script.js" defer></script>
 </head>
