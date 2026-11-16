@@ -5,22 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Numerica - Calculadora de Métodos Numéricos</title>
   <link rel="stylesheet" href="style.css">
-  
   <script>
     var Module = {
       onRuntimeInitialized: function () {
         console.log("Módulo WebAssembly (C++) listo.");
-        // Inicializar grillas por defecto
-        if (typeof inicializarGrillas === 'function') inicializarGrillas();
+        if (typeof generarGrillas === 'function') generarGrillas();
       }
     };
   </script>
-  <!-- Carga obligatoria del WASM ANTES de script.js -->
   <script src="core.js" defer></script>
-  <script src="script.js" defer></script>
-  
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
   <header class="app-header">
@@ -30,110 +26,230 @@
       <span class="badge">MAC UNAM</span>
     </div>
     <nav class="top-nav">
-      <button class="nav-btn active" onclick="mostrarSeccion('unidad2', this)">Unidad 2</button>
-      <button class="nav-btn" onclick="mostrarSeccion('unidad3', this)">Unidad 3</button>
-      <button class="nav-btn" onclick="mostrarSeccion('unidad4', this)">Unidad 4</button>
-      <button class="nav-btn" onclick="mostrarSeccion('unidad5', this)">Unidad 5</button>
+      <button class="nav-btn active" onclick="mostrarUnidad('unidad2', this)">Unidad 2</button>
+      <button class="nav-btn" onclick="mostrarUnidad('unidad3', this)">Unidad 3</button>
+      <button class="nav-btn" onclick="mostrarUnidad('unidad4', this)">Unidad 4</button>
+      <button class="nav-btn" onclick="mostrarUnidad('unidad5', this)">Unidad 5</button>
       <button class="nav-btn btn-salir" onclick="confirmarSalida()">Salir</button>
     </nav>
   </header>
 
-  <!-- UNIDAD 2: RAÍCES -->
+  <!-- ========================================== -->
+  <!-- UNIDAD 2: RAÍCES                           -->
+  <!-- ========================================== -->
   <div id="unidad2" class="main-layout">
     <aside class="sidebar">
       <div class="sidebar-header"><h3>Unidad 2: Raíces</h3></div>
       <ul class="method-list">
-        <li class="method-item active"><a href="#" onclick="seleccionarMetodo('newton', 'unidad2', this)">Newton-Raphson</a></li>
-        <li class="method-item"><a href="#" onclick="seleccionarMetodo('biseccion', 'unidad2', this)">Bisección</a></li>
-        <li class="method-item"><a href="#" onclick="seleccionarMetodo('secante', 'unidad2', this)">Secante</a></li>
+        <li class="method-item active" id="nav-newton"><a href="#" onclick="cambiarVista('unidad2', 'newton', this)">Newton-Raphson</a></li>
+        <li class="method-item" id="nav-biseccion"><a href="#" onclick="cambiarVista('unidad2', 'biseccion', this)">Bisección</a></li>
+        <li class="method-item" id="nav-secante"><a href="#" onclick="cambiarVista('unidad2', 'secante', this)">Secante</a></li>
       </ul>
     </aside>
     <main class="content-area">
-      <!-- Vistas dinámicas inyectadas por JS o estructuradas aquí. Para mantener tu diseño, aquí unificados los formularios escalares -->
-      <section class="card form-card">
-        <h3 id="tituloMetodoU2">Método de Newton-Raphson</h3>
-        <form id="formU2" onsubmit="event.preventDefault(); ejecutarMetodoU2();">
-          <div class="form-group">
-            <label>Función $f(x)$:</label>
-            <input type="text" id="inputFuncion" placeholder="Ej. x^3 - 2*x - 5" required>
-            <div class="math-keyboard" id="mathKeyboard">
-              <button type="button" class="key-btn" onclick="insertarSimbolo('x')">x</button>
-              <button type="button" class="key-btn" onclick="insertarSimbolo('+')">+</button>
-              <button type="button" class="key-btn" onclick="insertarSimbolo('-')">-</button>
-              <button type="button" class="key-btn" onclick="insertarSimbolo('*')">*</button>
-              <button type="button" class="key-btn" onclick="insertarSimbolo('/')">/</button>
-              <button type="button" class="key-btn" onclick="insertarSimbolo('^')">xⁿ</button>
+      <!-- VISTA NEWTON -->
+      <div id="vista-newton" class="vista-metodo">
+        <section class="card theory-card">
+          <h2>Método de Newton-Raphson</h2>
+          <p>Se programa una de las ecuaciones no lineales visto en clase. Se ingresa un valor inicial para poder calcular la solución de la ecuación no lineal y el programa presenta la solución, se genera tabla de datos para revisar solución.</p>
+        </section>
+        <section class="card form-card">
+          <form onsubmit="event.preventDefault(); ejecutarU2('newton');">
+            <div class="form-group">
+              <label>Función $f(x)$:</label>
+              <input type="text" id="fn_newton" placeholder="Ej. x^3 - 2*x - 5" required>
             </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-4" id="grpX0"><label>X0 (o Límite Inf):</label><input type="number" id="inputX0" step="any" required></div>
-            <div class="form-group col-4" id="grpX1"><label>X1 (o Límite Sup):</label><input type="number" id="inputX1" step="any"></div>
-            <div class="form-group col-4"><label>Tolerancia:</label><input type="number" id="inputTol" step="any" value="0.0001" required></div>
-            <div class="form-group col-4"><label>Máx Iteraciones:</label><input type="number" id="inputMaxIter" value="100" required></div>
-          </div>
-          <button type="submit" class="btn btn-primary btn-block">Calcular</button>
-        </form>
-      </section>
-      
-      <section class="card results-card hidden" id="cardResultadosU2">
+            <div class="form-row">
+              <div class="form-group col-4"><label>Valor Inicial ($x_0$):</label><input type="number" id="x0_newton" step="any" required></div>
+              <div class="form-group col-4"><label>Tolerancia:</label><input type="number" id="tol_newton" step="any" value="0.0001" required></div>
+              <div class="form-group col-4"><label>Máx. Iteraciones:</label><input type="number" id="iter_newton" value="100" required></div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Calcular Raíz</button>
+          </form>
+        </section>
+      </div>
+
+      <!-- VISTA BISECCIÓN -->
+      <div id="vista-biseccion" class="vista-metodo hidden">
+        <section class="card theory-card">
+          <h2>Método de Bisección</h2>
+          <p>Se programa una de las ecuaciones no lineales visto en clase. Se ingresa un valor inicial para poder calcular la solución de una ecuación no lineal y el programa presenta la solución, genera tabla de datos para revisar la solución.</p>
+        </section>
+        <section class="card form-card">
+          <form onsubmit="event.preventDefault(); ejecutarU2('biseccion');">
+            <div class="form-group">
+              <label>Función $f(x)$:</label>
+              <input type="text" id="fn_biseccion" placeholder="Ej. x^3 - 2*x - 5" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-4"><label>Límite Inferior ($a$):</label><input type="number" id="a_bis" step="any" required></div>
+              <div class="form-group col-4"><label>Límite Superior ($b$):</label><input type="number" id="b_bis" step="any" required></div>
+              <div class="form-group col-4"><label>Tolerancia:</label><input type="number" id="tol_bis" step="any" value="0.0001" required></div>
+              <div class="form-group col-4"><label>Máx. Iter:</label><input type="number" id="iter_bis" value="100" required></div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Calcular Raíz</button>
+          </form>
+        </section>
+      </div>
+
+      <!-- VISTA SECANTE -->
+      <div id="vista-secante" class="vista-metodo hidden">
+        <section class="card theory-card">
+          <h2>Método de la Secante</h2>
+          <p>Se programa una de las ecuaciones no lineales visto en clase. Se ingresan dos valores iniciales para poder calcular la solución de una ecuación no lineal y el programa presenta la solución, se genera tabla de datos para revisar solución.</p>
+        </section>
+        <section class="card form-card">
+          <form onsubmit="event.preventDefault(); ejecutarU2('secante');">
+            <div class="form-group">
+              <label>Función $f(x)$:</label>
+              <input type="text" id="fn_secante" placeholder="Ej. x^3 - 2*x - 5" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-4"><label>$x_0$:</label><input type="number" id="x0_sec" step="any" required></div>
+              <div class="form-group col-4"><label>$x_1$:</label><input type="number" id="x1_sec" step="any" required></div>
+              <div class="form-group col-4"><label>Tolerancia:</label><input type="number" id="tol_sec" step="any" value="0.0001" required></div>
+              <div class="form-group col-4"><label>Máx. Iter:</label><input type="number" id="iter_sec" value="100" required></div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Calcular Raíz</button>
+          </form>
+        </section>
+      </div>
+
+      <!-- RESULTADOS U2 (Compartido) -->
+      <section class="card results-card hidden" id="resU2">
         <h3>Resultados</h3>
-        <div id="alertaErrorU2" class="alert alert-danger hidden"></div>
+        <div id="errU2" class="alert alert-danger hidden"></div>
         <div class="metrics-grid">
-          <div class="metric-box"><span class="metric-title">Raíz</span><span class="metric-value" id="valRaizU2">-</span></div>
+          <div class="metric-box"><span class="metric-title">Raíz Aproximada</span><span class="metric-value" id="valRaizU2">-</span></div>
           <div class="metric-box"><span class="metric-title">Iteraciones</span><span class="metric-value" id="valIterU2">-</span></div>
         </div>
         <div class="table-container">
           <table class="table-custom">
-            <thead id="headTablaU2"></thead>
-            <tbody id="cuerpoTablaU2"></tbody>
+            <thead><tr><th>k</th><th>x</th><th>Error</th></tr></thead>
+            <tbody id="tablaU2"></tbody>
           </table>
         </div>
       </section>
     </main>
   </div>
 
-  <!-- UNIDADES 3, 4 y 5: MATRICIALES (Diseño unificado de Grid) -->
-  <div id="unidadMatricial" class="main-layout seccion-oculta">
+  <!-- ========================================== -->
+  <!-- UNIDAD 3: SISTEMAS DIRECTOS                -->
+  <!-- ========================================== -->
+  <div id="unidad3" class="main-layout hidden">
     <aside class="sidebar">
-      <div class="sidebar-header"><h3 id="tituloSidebarMatricial">Métodos Matriciales</h3></div>
-      <ul class="method-list" id="listaMetodosMatriciales">
-        <!-- Inyectado por JS según la unidad -->
+      <div class="sidebar-header"><h3>Unidad 3: Directos</h3></div>
+      <ul class="method-list">
+        <li class="method-item active"><a href="#" onclick="cambiarVista('unidad3', 'gaussjordan', this)">Gauss-Jordan</a></li>
+        <li class="method-item"><a href="#" onclick="cambiarVista('unidad3', 'doolittle', this)">Doolittle</a></li>
+        <li class="method-item"><a href="#" onclick="cambiarVista('unidad3', 'crout', this)">Crout</a></li>
       </ul>
     </aside>
     <main class="content-area">
+      <!-- VISTA GAUSS-JORDAN -->
+      <div id="vista-gaussjordan" class="vista-metodo">
+        <section class="card theory-card">
+          <h2>Gauss-Jordan</h2>
+          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Gauss-Jordan.</p>
+        </section>
+      </div>
+      <!-- VISTA DOOLITTLE -->
+      <div id="vista-doolittle" class="vista-metodo hidden">
+        <section class="card theory-card">
+          <h2>Factorización LU (Doolittle)</h2>
+          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Doolittle.</p>
+        </section>
+      </div>
+      <!-- VISTA CROUT -->
+      <div id="vista-crout" class="vista-metodo hidden">
+        <section class="card theory-card">
+          <h2>Factorización LU (Crout)</h2>
+          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Crout.</p>
+        </section>
+      </div>
+
+      <!-- FORMULARIO MATRICIAL COMPARTIDO (U3, U4, U5) -->
       <section class="card form-card">
-        <h3 id="tituloMetodoMatricial">Método</h3>
-        <form id="formMatricial" onsubmit="event.preventDefault(); ejecutarMetodoMatricial();">
+        <form onsubmit="event.preventDefault(); ejecutarMatricial();">
           <div class="form-row">
             <div class="form-group col-4">
               <label>Dimensión (n x n):</label>
-              <input type="number" id="inputN" min="2" max="10" value="3" onchange="generarGrillasMatriciales()" required>
+              <input type="number" id="dimN" min="2" max="10" value="3" onchange="generarGrillas()" required>
             </div>
             <div class="form-group col-4" id="grpTolMat">
-              <label>Tolerancia:</label>
-              <input type="number" id="inputTolMat" step="any" value="0.0001">
+              <label>Tolerancia (Solo Iterativos/Potencia):</label>
+              <input type="number" id="tolMat" step="any" value="0.0001">
             </div>
           </div>
-          
           <div class="matrix-layout">
-            <div class="matrix-section">
-              <label>Matriz A</label>
-              <div id="gridMatrizA" class="matrix-bracket"></div>
-            </div>
-            <div class="matrix-section" id="seccionVectorB">
-              <label id="labelVectorB">Vector b / x0</label>
-              <div id="gridVectorB" class="matrix-bracket"></div>
-            </div>
+            <div class="matrix-section"><label>Matriz A</label><div id="gridA" class="matrix-bracket"></div></div>
+            <div class="matrix-section"><label>Vector b / x0</label><div id="gridB" class="matrix-bracket"></div></div>
           </div>
           <button type="submit" class="btn btn-primary btn-block mt-3">Ejecutar Método</button>
         </form>
       </section>
 
-      <section class="card results-card hidden" id="cardResultadosMatricial">
-        <h3>Resultados</h3>
-        <div id="alertaErrorMat" class="alert alert-danger hidden"></div>
-        <div id="resultadosDinamicosMatriciales"></div>
+      <!-- RESULTADOS MATRICIALES -->
+      <section class="card results-card hidden" id="resMatricial">
+        <h3>Resultados del Sistema</h3>
+        <div id="errMatricial" class="alert alert-danger hidden"></div>
+        <div id="salidaMatricial"></div>
       </section>
+    </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- UNIDAD 4: ITERATIVOS                       -->
+  <!-- ========================================== -->
+  <div id="unidad4" class="main-layout hidden">
+    <aside class="sidebar">
+      <div class="sidebar-header"><h3>Unidad 4: Iterativos</h3></div>
+      <ul class="method-list">
+        <li class="method-item active"><a href="#" onclick="cambiarVista('unidad4', 'jacobi', this)">Jacobi</a></li>
+        <li class="method-item"><a href="#" onclick="cambiarVista('unidad4', 'gaussseidel', this)">Gauss-Seidel</a></li>
+      </ul>
+    </aside>
+    <main class="content-area">
+      <div id="vista-jacobi" class="vista-metodo">
+        <section class="card theory-card">
+          <h2>Jacobi</h2>
+          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Jacobi.</p>
+        </section>
+      </div>
+      <div id="vista-gaussseidel" class="vista-metodo hidden">
+        <section class="card theory-card">
+          <h2>Gauss-Seidel</h2>
+          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Gauss-Seidel</p>
+        </section>
+      </div>
+      <!-- Reutiliza el formulario y resultados matriciales de JS -->
+    </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- UNIDAD 5: VALORES PROPIOS                  -->
+  <!-- ========================================== -->
+  <div id="unidad5" class="main-layout hidden">
+    <aside class="sidebar">
+      <div class="sidebar-header"><h3>Unidad 5: V. Propios</h3></div>
+      <ul class="method-list">
+        <li class="method-item active"><a href="#" onclick="cambiarVista('unidad5', 'potencia', this)">Potencia</a></li>
+        <li class="method-item"><a href="#" onclick="cambiarVista('unidad5', 'potenciainversa', this)">Potencia Inversa</a></li>
+      </ul>
+    </aside>
+    <main class="content-area">
+      <div id="vista-potencia" class="vista-metodo">
+        <section class="card theory-card">
+          <h2>Método de la Potencia</h2>
+          <p>El programa recibe una matriz cuadrada y el programa presenta el valor propio máximo y su vector propio correspondiente.</p>
+        </section>
+      </div>
+      <div id="vista-potenciainversa" class="vista-metodo hidden">
+        <section class="card theory-card">
+          <h2>Potencia Inversa</h2>
+          <p>El programa recibe una matriz cuadrada y el programa presenta el valor propio mínimo y su vector propio correspondiente.</p>
+        </section>
+      </div>
     </main>
   </div>
 </body>
