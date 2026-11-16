@@ -1,5 +1,5 @@
 /**
- * NUMÉRICA - Calculadora de Métodos Numéricos
+ * NUMERICA - Calculadora de Métodos Numéricos
  * JavaScript principal para manejo de la interfaz y puente con WebAssembly (Emscripten / C++)
  */
 
@@ -60,14 +60,15 @@ function ejecutarNewton() {
   const tol = parseFloat(document.getElementById('inputTol').value);
   const maxIter = parseInt(document.getElementById('inputMaxIter').value);
 
-  const cardResultados = document.getElementById('cardResultados');
-  const alertaError = document.getElementById('alertaError');
-  const cuerpoTabla = document.getElementById('cuerpoTabla');
+  // CORRECCIÓN: Se actualizaron los IDs para coincidir con el HTML ("Newton")
+  const cardResultados = document.getElementById('cardResultadosNewton');
+  const alertaError = document.getElementById('alertaErrorNewton');
+  const cuerpoTabla = document.getElementById('cuerpoTablaNewton');
 
-  // Limpiar estados previos
-  alertaError.style.display = 'none';
+  // CORRECCIÓN: Usar clases en lugar de .style para ocultar/mostrar
+  alertaError.classList.add('hidden');
   cuerpoTabla.innerHTML = '';
-  cardResultados.style.display = 'block';
+  cardResultados.classList.remove('hidden');
 
   let res = null;
 
@@ -77,15 +78,15 @@ function ejecutarNewton() {
 
     if (!res.exito) {
       alertaError.innerText = res.error_msg || "Error al procesar el método.";
-      alertaError.style.display = 'block';
-      document.getElementById('valRaiz').innerText = "-";
-      document.getElementById('valIteraciones').innerText = "-";
+      alertaError.classList.remove('hidden');
+      document.getElementById('valRaizNewton').innerText = "-";
+      document.getElementById('valIteracionesNewton').innerText = "-";
       return;
     }
 
-    // Actualizar métricas
-    document.getElementById('valRaiz').innerText = Number(res.raiz).toFixed(6);
-    document.getElementById('valIteraciones').innerText = res.iteraciones;
+    // Actualizar métricas (IDs corregidos)
+    document.getElementById('valRaizNewton').innerText = Number(res.raiz).toFixed(6);
+    document.getElementById('valIteracionesNewton').innerText = res.iteraciones;
 
     // Poblar la tabla desde el std::vector<FilaIteracion> (VectorFilas)
     let htmlFilas = '';
@@ -109,7 +110,7 @@ function ejecutarNewton() {
 
   } catch (err) {
     alertaError.innerText = "Error inesperado al ejecutar el algoritmo: " + (err && err.message ? err.message : err);
-    alertaError.style.display = 'block';
+    alertaError.classList.remove('hidden');
   } finally {
     // Liberar la memoria del vector de C++
     if (res && res.tabla && typeof res.tabla.delete === 'function') {
