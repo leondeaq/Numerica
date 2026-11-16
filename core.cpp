@@ -7,6 +7,8 @@
 #include <cctype>
 #include <emscripten/bind.h>
 
+// Prueba de compilacion
+
 // Namespaces para simplificar el cÃ³digo sin prefijos std:: o emscripten::
 using namespace std;
 using namespace emscripten;
