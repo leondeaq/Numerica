@@ -7,11 +7,10 @@
   <link rel="stylesheet" href="style.css">
   <!-- Carga del WebAssembly compilado por Emscripten -->
   <script>
+    // Configuración del módulo Emscripten (debe definirse ANTES de core.js)
     var Module = {
       onRuntimeInitialized: function () {
         console.log("Módulo WebAssembly (C++) listo.");
-        // Inicializar grilla de potencia por defecto cuando cargue
-        if (typeof generarGrillaPotencia === 'function') generarGrillaPotencia();
       }
     };
   </script>
@@ -39,200 +38,118 @@
     <!-- Sidebar / Menú Lateral de Métodos -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h3>Unidad 2 & 5: Métodos</h3>
+        <h3>Unidad 2: Ecuaciones No Lineales</h3>
       </div>
       <ul class="method-list">
-        <li class="method-item active" id="nav-newton">
-          <a href="#" onclick="seleccionarMetodo('newton')">Método de Newton-Raphson</a>
-        </li>
+        <li class="method-item active"><a href="#" onclick="seleccionarMetodo('newton')">Método de Newton-Raphson</a></li>
         <li class="method-item disabled"><a href="#">Método de Bisección</a></li>
         <li class="method-item disabled"><a href="#">Método de Secante</a></li>
-        <li class="method-item" id="nav-potencia">
-          <a href="#" onclick="seleccionarMetodo('potencia')">Método de la Potencia</a>
-        </li>
+        <li class="method-item disabled"><a href="#">Método de Bairstow</a></li>
       </ul>
     </aside>
 
     <!-- Contenido Principal -->
     <main class="content-area">
-      
-      <!-- ========================================== -->
-      <!-- VISTA: MÉTODO DE NEWTON-RAPHSON            -->
-      <!-- ========================================== -->
-      <div id="vista-newton">
-        <section class="card theory-card">
-          <h2>Método de Newton-Raphson</h2>
-          <p>Es un algoritmo iterativo abierto para encontrar la raíz de una función $f(x) = 0$. Utiliza la primera derivada $f'(x)$ como la pendiente de la recta tangente en el punto $x_k$ para aproximarse a la raíz.</p>
-          <div class="formula-box">
-            $$x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)}$$
-          </div>
-        </section>
+      <!-- Tarjeta Teórica -->
+      <section class="card theory-card">
+        <h2>Método de Newton-Raphson</h2>
+        <p>Es un algoritmo iterativo abierto para encontrar la raíz de una función $f(x) = 0$. Utiliza la primera derivada $f'(x)$ como la pendiente de la recta tangente en el punto $x_k$ para aproximarse a la raíz mediante la fórmula:</p>
+        <div class="formula-box">
+          $$x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)}$$
+        </div>
+      </section>
 
-        <section class="card form-card">
-          <div class="card-header-actions">
-            <h3>Entrada de Datos</h3>
-            <button class="btn btn-secondary" onclick="cargarEjemploNewton()"> Cargar Ejemplo</button>
-          </div>
+      <!-- Panel de Control y Formulario -->
+      <section class="card form-card">
+        <div class="card-header-actions">
+          <h3>Entrada de Datos</h3>
+          <button class="btn btn-secondary" onclick="cargarEjemploNewton()"> Cargar Ejemplo por Defecto</button>
+        </div>
 
-          <form id="formNewton" onsubmit="event.preventDefault(); ejecutarNewton();">
-            <div class="form-group">
-              <label for="inputFuncion">Función $f(x)$:</label>
-              <input type="text" id="inputFuncion" placeholder="Ej. x^3 - 2*x - 5" autocomplete="off" required>
-              <div class="math-keyboard" id="mathKeyboard">
-                <button type="button" class="key-btn" onclick="insertarSimbolo('x')">x</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('+')">+</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('-')">-</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('*')">*</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('/')">/</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('^')">xⁿ</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('(')">(</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo(')')">)</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('sqrt(')">√</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('sin(')">sin</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('cos(')">cos</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('exp(')">eˣ</button>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group col-4">
-                <label for="inputX0">Valor Inicial ($x_0$):</label>
-                <input type="number" id="inputX0" step="any" placeholder="Ej. 2.0" required>
-              </div>
-              <div class="form-group col-4">
-                <label for="inputTol">Tolerancia ($\epsilon$):</label>
-                <input type="number" id="inputTol" step="any" value="0.0001" required>
-              </div>
-              <div class="form-group col-4">
-                <label for="inputMaxIter">Máx. Iteraciones:</label>
-                <input type="number" id="inputMaxIter" min="1" max="1000" value="100" required>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary btn-block">Calcular Raíz</button>
-            </div>
-          </form>
-        </section>
-
-        <section class="card results-card hidden" id="cardResultadosNewton">
-          <h3>Resultados del Cálculo</h3>
-          <div id="alertaErrorNewton" class="alert alert-danger hidden"></div>
-
-          <div class="metrics-grid">
-            <div class="metric-box">
-              <span class="metric-title">Raíz Aproximada ($x_r$)</span>
-              <span class="metric-value" id="valRaizNewton">-</span>
-            </div>
-            <div class="metric-box">
-              <span class="metric-title">Iteraciones Realizadas</span>
-              <span class="metric-value" id="valIteracionesNewton">-</span>
-            </div>
-          </div>
-
-          <div class="table-container">
-            <table class="table-custom">
-              <thead>
-                <tr>
-                  <th>$k$</th><th>$x_k$</th><th>$f(x_k)$</th><th>$f'(x_k)$</th><th>Error Relativo</th>
-                </tr>
-              </thead>
-              <tbody id="cuerpoTablaNewton"></tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <!-- ========================================== -->
-      <!-- VISTA: MÉTODO DE LA POTENCIA               -->
-      <!-- ========================================== -->
-      <div id="vista-potencia" class="hidden">
-        <section class="card theory-card">
-          <h2>Método de la Potencia</h2>
-          <p>Algoritmo numérico utilizado para aproximar el eigenvalor dominante (el de mayor magnitud) y su eigenvector asociado de una matriz cuadrada $A$. Funciona multiplicando iterativamente la matriz por un vector inicial y normalizándolo mediante el cociente de Rayleigh.</p>
-        </section>
-
-        <section class="card form-card">
-          <div class="card-header-actions">
-            <h3>Entrada de Datos (Matriz $A$ y Vector $x_0$)</h3>
-            <button class="btn btn-secondary" onclick="cargarEjemploPotencia()"> Cargar Ejemplo</button>
-          </div>
-
-          <form id="formPotencia" onsubmit="event.preventDefault(); ejecutarPotencia();">
+        <form id="formNewton" onsubmit="event.preventDefault(); ejecutarNewton();">
+          <!-- Entrada de Función -->
+          <div class="form-group">
+            <label for="inputFuncion">Función $f(x)$:</label>
+            <input type="text" id="inputFuncion" placeholder="Ej. x^3 - 2*x - 5" autocomplete="off" required>
             
-            <div class="form-row">
-              <div class="form-group col-4">
-                <label for="inputN">Tamaño de la Matriz ($n \times n$):</label>
-                <input type="number" id="inputN" min="2" max="10" value="3" onchange="generarGrillaPotencia()" required>
-              </div>
-              <div class="form-group col-4">
-                <label for="inputTolPot">Tolerancia ($\epsilon$):</label>
-                <input type="number" id="inputTolPot" step="any" value="0.0001" required>
-              </div>
-              <div class="form-group col-4">
-                <label for="inputMaxIterPot">Máx. Iteraciones:</label>
-                <input type="number" id="inputMaxIterPot" min="1" max="1000" value="50" required>
-              </div>
-            </div>
-
-            <!-- Contenedor dinámico para la grilla de la matriz y el vector -->
-            <div class="matrix-layout">
-              <div class="matrix-section">
-                <label>Matriz $A$</label>
-                <div id="matriz-A-container" class="matrix-bracket">
-                  <!-- Se llena con JS -->
-                </div>
-              </div>
-              <div class="matrix-section">
-                <label>Vector Inicial $x_0$</label>
-                <div id="vector-x-container" class="matrix-bracket">
-                  <!-- Se llena con JS -->
-                </div>
-              </div>
-            </div>
-
-            <div class="form-actions mt-3">
-              <button type="submit" class="btn btn-primary btn-block">Calcular Eigenvalor Dominante</button>
-            </div>
-          </form>
-        </section>
-
-        <section class="card results-card hidden" id="cardResultadosPotencia">
-          <h3>Resultados del Método de la Potencia</h3>
-          <div id="alertaErrorPotencia" class="alert alert-danger hidden"></div>
-
-          <div class="metrics-grid">
-            <div class="metric-box">
-              <span class="metric-title">Eigenvalor Dominante ($\lambda$)</span>
-              <span class="metric-value text-accent" id="valEigenvalor">-</span>
-            </div>
-            <div class="metric-box">
-              <span class="metric-title">Iteraciones</span>
-              <span class="metric-value" id="valIteracionesPotencia">-</span>
-            </div>
-            <div class="metric-box vector-box">
-              <span class="metric-title">Eigenvector Aproximado</span>
-              <div class="matrix-bracket-small" id="valEigenvector">
-                <!-- Se llena con JS -->
-              </div>
+            <!-- Teclado Matemático de Accesos Rápidos -->
+            <div class="math-keyboard" id="mathKeyboard">
+              <button type="button" class="key-btn" onclick="insertarSimbolo('x')">x</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('+')">+</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('-')">-</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('*')">*</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('/')">/</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('^')">xⁿ</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('(')">(</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo(')')">)</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('sqrt(')">√</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('sin(')">sin</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('cos(')">cos</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('exp(')">eˣ</button>
             </div>
           </div>
 
-          <div class="table-container">
-            <table class="table-custom">
-              <thead>
-                <tr>
-                  <th>Iteración ($k$)</th>
-                  <th>Eigenvalor ($\lambda_k$)</th>
-                  <th>Error Aproximado</th>
-                </tr>
-              </thead>
-              <tbody id="cuerpoTablaPotencia"></tbody>
-            </table>
+          <!-- Parámetros Numéricos -->
+          <div class="form-row">
+            <div class="form-group col-4">
+              <label for="inputX0">Valor Inicial ($x_0$):</label>
+              <input type="number" id="inputX0" step="any" placeholder="Ej. 2.0" required>
+            </div>
+            <div class="form-group col-4">
+              <label for="inputTol">Tolerancia ($\epsilon$):</label>
+              <input type="number" id="inputTol" step="any" value="0.0001" required>
+            </div>
+            <div class="form-group col-4">
+              <label for="inputMaxIter">Máx. Iteraciones:</label>
+              <input type="number" id="inputMaxIter" min="1" max="1000" value="100" required>
+            </div>
           </div>
-        </section>
-      </div>
 
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-block">Calcular Raíz</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Resumen de Resultados y Alertas -->
+      <section class="card results-card" id="cardResultados" style="display: none;">
+        <h3>Resultados del Cálculo</h3>
+        
+        <div id="alertaError" class="alert alert-danger" style="display: none;"></div>
+
+        <div class="metrics-grid" id="metricsGrid">
+          <div class="metric-box">
+            <span class="metric-title">Raíz Aproximada ($x_r$)</span>
+            <span class="metric-value" id="valRaiz">-</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-title">Iteraciones Realizadas</span>
+            <span class="metric-value" id="valIteraciones">-</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-title">Estado de Convergencia</span>
+            <span class="metric-value badge-success" id="valEstado">Convergió</span>
+          </div>
+        </div>
+
+        <!-- Tabla Responsiva de Iteraciones -->
+        <div class="table-container">
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>$k$</th>
+                <th>$x_k$</th>
+                <th>$f(x_k)$</th>
+                <th>$f'(x_k)$</th>
+                <th>Error Relativo</th>
+              </tr>
+            </thead>
+            <tbody id="cuerpoTabla">
+              <!-- Filas dinámicas -->
+            </tbody>
+          </table>
+        </div>
+      </section>
     </main>
   </div>
 </body>
