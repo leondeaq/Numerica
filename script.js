@@ -3,120 +3,86 @@
  * JavaScript principal para manejo de la interfaz y puente con WebAssembly (Emscripten / C++)
  */
 
-// VARIABLES GLOBALES DE ESTADO
-let metodoActivo = 'newton';
 let unidadActiva = 'unidad2';
+let metodoActivo = 'newton';
 
-// 1. UTILIDADES Y UI
-function insertarSimbolo(simbolo) {
-  const input = document.getElementById('inputFuncion');
-  const start = input.selectionStart;
-  const end = input.selectionEnd;
-  input.value = input.value.substring(0, start) + simbolo + input.value.substring(end);
-  input.focus();
+// ==========================================
+// 1. NAVEGACIÓN Y UI
+// ==========================================
+
+// Cambiar entre unidades desde el menú superior
+function mostrarUnidad(idUnidad, btn) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  
+  ['unidad2', 'unidad3', 'unidad4', 'unidad5'].forEach(u => {
+    document.getElementById(u).classList.add('hidden');
+  });
+  
+  document.getElementById(idUnidad).classList.remove('hidden');
+  unidadActiva = idUnidad;
+
+  const primerEnlace = document.querySelector(`#${idUnidad} .method-list .method-item a`);
+  if (primerEnlace) primerEnlace.click();
+  
+  if(idUnidad !== 'unidad2') {
+    const formCard = document.querySelector('.form-card:has(#dimN)');
+    const resCard = document.querySelector('#resMatricial');
+    document.querySelector(`#${idUnidad} .content-area`).insertBefore(formCard, document.querySelector(`#${idUnidad} .content-area`).lastElementChild);
+    document.querySelector(`#${idUnidad} .content-area`).appendChild(resCard);
+    generarGrillas();
+  }
+}
+
+// Cambiar entre métodos desde el menú lateral
+function cambiarVista(unidad, metodo, elementoLi) {
+  metodoActivo = metodo;
+
+  const lista = elementoLi.closest('.method-list');
+  lista.querySelectorAll('.method-item').forEach(li => li.classList.remove('active'));
+  elementoLi.parentElement.classList.add('active');
+
+  document.querySelectorAll(`#${unidad} .vista-metodo`).forEach(v => v.classList.add('hidden'));
+  document.getElementById(`vista-${metodo}`).classList.remove('hidden');
+
+  document.getElementById('resU2')?.classList.add('hidden');
+  document.getElementById('resMatricial')?.classList.add('hidden');
+
+  // Ajustes de UI para matrices según el método
+  if (unidad !== 'unidad2') {
+    const grpTol = document.getElementById('grpTolMat');
+    if (grpTol) {
+      grpTol.style.display = ['jacobi', 'gaussseidel', 'potencia', 'potenciainversa'].includes(metodo) ? 'block' : 'none';
+    }
+  }
 }
 
 function confirmarSalida() {
   if (confirm("¿Estás seguro de que deseas salir de Numérica?")) window.close();
 }
 
-function mostrarSeccion(idUnidad, btn) {
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  
-  unidadActiva = idUnidad;
-  document.getElementById('unidad2').classList.add('seccion-oculta');
-  document.getElementById('unidadMatricial').classList.add('seccion-oculta');
+// ==========================================
+// 2. UTILIDADES PARA MATRICES (U3, U4, U5)
+// ==========================================
 
-  if (idUnidad === 'unidad2') {
-    document.getElementById('unidad2').classList.remove('seccion-oculta');
-    seleccionarMetodo('newton', 'unidad2');
-  } else {
-    document.getElementById('unidadMatricial').classList.remove('seccion-oculta');
-    configurarSidebarMatricial(idUnidad);
-  }
-}
-
-function configurarSidebarMatricial(unidad) {
-  const lista = document.getElementById('listaMetodosMatriciales');
-  const titulo = document.getElementById('tituloSidebarMatricial');
-  lista.innerHTML = '';
-  
-  let metodos = [];
-  if(unidad === 'unidad3') {
-    titulo.innerText = "Sistemas Directos";
-    metodos = [
-      { id: 'gaussjordan', nombre: 'Gauss-Jordan' },
-      { id: 'doolittle', nombre: 'Factorización LU (Doolittle)' },
-      { id: 'crout', nombre: 'Factorización LU (Crout)' }
-    ];
-  } else if(unidad === 'unidad4') {
-    titulo.innerText = "Métodos Iterativos";
-    metodos = [
-      { id: 'jacobi', nombre: 'Jacobi' },
-      { id: 'gaussseidel', nombre: 'Gauss-Seidel' }
-    ];
-  } else if(unidad === 'unidad5') {
-    titulo.innerText = "Valores Propios";
-    metodos = [
-      { id: 'potencia', nombre: 'Método de la Potencia' },
-      { id: 'potenciainversa', nombre: 'Potencia Inversa' }
-    ];
-  }
-  
-  metodos.forEach((m, idx) => {
-    lista.innerHTML += `<li class="method-item ${idx===0?'active':''}"><a href="#" onclick="seleccionarMetodo('${m.id}', '${unidad}', this.parentElement)">${m.nombre}</a></li>`;
-  });
-  
-  seleccionarMetodo(metodos[0].id, unidad);
-}
-
-function seleccionarMetodo(metodo, unidad, liElement) {
-  metodoActivo = metodo;
-  
-  if(liElement) {
-    liElement.parentElement.querySelectorAll('.method-item').forEach(el => el.classList.remove('active'));
-    liElement.classList.add('active');
-  }
-
-  if (unidad === 'unidad2') {
-    document.getElementById('tituloMetodoU2').innerText = "Método de " + metodo.toUpperCase();
-    document.getElementById('grpX1').style.display = (metodo === 'biseccion' || metodo === 'secante') ? 'block' : 'none';
-  } else {
-    document.getElementById('tituloMetodoMatricial').innerText = "Método: " + metodo.toUpperCase();
-    document.getElementById('grpTolMat').style.display = (metodo === 'gaussjordan' || metodo === 'doolittle' || metodo === 'crout') ? 'none' : 'block';
-    document.getElementById('labelVectorB').innerText = (metodo === 'potencia' || metodo === 'potenciainversa') ? 'Vector inicial x0' : 'Vector b';
-    generarGrillasMatriciales();
-  }
-  
-  document.getElementById('cardResultadosU2').classList.add('hidden');
-  document.getElementById('cardResultadosMatricial').classList.add('hidden');
-}
-
-// 2. GENERADORES DE GRILLA (UI)
-function inicializarGrillas() { generarGrillasMatriciales(); }
-
-function generarGrillasMatriciales() {
-  const n = parseInt(document.getElementById('inputN').value) || 3;
-  const gridA = document.getElementById('gridMatrizA');
-  const gridB = document.getElementById('gridVectorB');
+function generarGrillas() {
+  const n = parseInt(document.getElementById('dimN').value) || 3;
+  const gridA = document.getElementById('gridA');
+  const gridB = document.getElementById('gridB');
   
   gridA.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
   gridA.innerHTML = '';
+  gridB.innerHTML = '';
+
   for(let i=0; i<n; i++) {
     for(let j=0; j<n; j++) {
       gridA.innerHTML += `<input type="number" step="any" class="matrix-input" id="A_${i}_${j}" value="${i===j?2:1}">`;
     }
-  }
-  
-  gridB.innerHTML = '';
-  for(let i=0; i<n; i++) {
     gridB.innerHTML += `<input type="number" step="any" class="matrix-input vector-input" id="B_${i}" value="1">`;
   }
 }
 
-// 3. PARSERS PARA C++ VÍA EMBIND
-function leerMatrizC(n) {
+function leerMatriz(n) {
   let mat = new Module.VectorVectorDouble();
   for(let i=0; i<n; i++) {
     let row = new Module.VectorDouble();
@@ -128,7 +94,7 @@ function leerMatrizC(n) {
   return mat;
 }
 
-function leerVectorC(n) {
+function leerVector(n) {
   let vec = new Module.VectorDouble();
   for(let i=0; i<n; i++) {
     vec.push_back(parseFloat(document.getElementById(`B_${i}`).value) || 0);
@@ -136,61 +102,91 @@ function leerVectorC(n) {
   return vec;
 }
 
-// 4. EJECUTORES
-function ejecutarMetodoU2() {
-  if (typeof Module === 'undefined') return alert("Cargando módulo de C++ (WebAssembly)...");
-  
-  const f = document.getElementById('inputFuncion').value;
-  const x0 = parseFloat(document.getElementById('inputX0').value);
-  const x1 = parseFloat(document.getElementById('inputX1').value) || 0;
-  const tol = parseFloat(document.getElementById('inputTol').value);
-  const maxI = parseInt(document.getElementById('inputMaxIter').value);
+// ==========================================
+// 3. EJECUTORES DE UNIDAD 2 (Raíces)
+// ==========================================
+
+function ejecutarU2(metodo) {
+  if (typeof Module === 'undefined') return alert("Cargando módulo...");
   
   let res;
   try {
-    if (metodoActivo === 'newton') res = Module.calcular_newton_cpp(f, x0, tol, maxI);
-    else if (metodoActivo === 'biseccion') res = Module.calcular_biseccion_cpp(f, x0, x1, tol, maxI);
-    else if (metodoActivo === 'secante') res = Module.calcular_secante_cpp(f, x0, x1, tol, maxI);
-    
-    renderResultadosU2(res, metodoActivo);
+    if (metodo === 'newton') {
+      const f = document.getElementById('fn_newton').value;
+      const x0 = parseFloat(document.getElementById('x0_newton').value);
+      const tol = parseFloat(document.getElementById('tol_newton').value);
+      const iter = parseInt(document.getElementById('iter_newton').value);
+      res = Module.calcular_newton_cpp(f, x0, tol, iter);
+    } 
+    else if (metodo === 'biseccion') {
+      const f = document.getElementById('fn_biseccion').value;
+      const a = parseFloat(document.getElementById('a_bis').value);
+      const b = parseFloat(document.getElementById('b_bis').value);
+      const tol = parseFloat(document.getElementById('tol_bis').value);
+      const iter = parseInt(document.getElementById('iter_bis').value);
+      res = Module.calcular_biseccion_cpp(f, a, b, tol, iter);
+    }
+    else if (metodo === 'secante') {
+      const f = document.getElementById('fn_secante').value;
+      const x0 = parseFloat(document.getElementById('x0_sec').value);
+      const x1 = parseFloat(document.getElementById('x1_sec').value);
+      const tol = parseFloat(document.getElementById('tol_sec').value);
+      const iter = parseInt(document.getElementById('iter_sec').value);
+      res = Module.calcular_secante_cpp(f, x0, x1, tol, iter);
+    }
+    renderResultadosU2(res);
+  } catch (e) {
+    mostrarErrorU2("Error en la ejecución. Revisa los datos de entrada.");
   } finally {
     if (res && res.tabla) res.tabla.delete();
   }
 }
 
-function renderResultadosU2(res, metodo) {
-  const card = document.getElementById('cardResultadosU2');
-  const errDiv = document.getElementById('alertaErrorU2');
-  card.classList.remove('hidden');
+function mostrarErrorU2(msg) {
+  document.getElementById('resU2').classList.remove('hidden');
+  document.getElementById('errU2').innerText = msg;
+  document.getElementById('errU2').classList.remove('hidden');
+  document.querySelector('#resU2 .metrics-grid').style.display = 'none';
+  document.querySelector('#resU2 .table-container').style.display = 'none';
+}
+
+function renderResultadosU2(res) {
+  document.getElementById('resU2').classList.remove('hidden');
   
   if (!res.exito) {
-    errDiv.innerText = res.error_msg;
-    errDiv.classList.remove('hidden');
+    mostrarErrorU2(res.error_msg || "El método falló.");
     return;
   }
   
-  errDiv.classList.add('hidden');
+  document.getElementById('errU2').classList.add('hidden');
+  document.querySelector('#resU2 .metrics-grid').style.display = 'grid';
+  document.querySelector('#resU2 .table-container').style.display = 'block';
+
   document.getElementById('valRaizU2').innerText = res.raiz.toFixed(6);
   document.getElementById('valIterU2').innerText = res.iteraciones;
   
   let html = '';
   for(let i=0; i<res.tabla.size(); i++) {
     const fila = res.tabla.get(i);
-    html += `<tr><td>${fila.k}</td><td>${fila.xk !== undefined ? fila.xk.toFixed(6) : fila.xr.toFixed(6)}</td><td>${fila.error.toExponential(4)}</td></tr>`;
+    const x_val = fila.xk !== undefined ? fila.xk : fila.xr;
+    html += `<tr><td>${fila.k}</td><td>${x_val.toFixed(6)}</td><td>${fila.error.toExponential(4)}</td></tr>`;
   }
-  document.getElementById('headTablaU2').innerHTML = '<tr><th>k</th><th>x</th><th>Error</th></tr>';
-  document.getElementById('cuerpoTablaU2').innerHTML = html;
+  document.getElementById('tablaU2').innerHTML = html;
 }
 
-function ejecutarMetodoMatricial() {
-  if (typeof Module === 'undefined') return alert("Cargando módulo de C++ (WebAssembly)...");
+// ==========================================
+// 4. EJECUTORES MATRICIALES (U3, U4, U5)
+// ==========================================
 
-  const n = parseInt(document.getElementById('inputN').value);
-  const tol = parseFloat(document.getElementById('inputTolMat').value) || 0.0001;
+function ejecutarMatricial() {
+  if (typeof Module === 'undefined') return alert("Cargando módulo...");
+
+  const n = parseInt(document.getElementById('dimN').value);
+  const tol = parseFloat(document.getElementById('tolMat').value) || 0.0001;
   const maxI = 100;
   
-  const A = leerMatrizC(n);
-  const b = leerVectorC(n);
+  const A = leerMatriz(n);
+  const b = leerVector(n);
   
   let res;
   try {
@@ -202,11 +198,10 @@ function ejecutarMetodoMatricial() {
     else if (metodoActivo === 'potencia') res = Module.calcular_potencia_cpp(A, b, tol, maxI);
     else if (metodoActivo === 'potenciainversa') res = Module.calcular_potencia_inversa_cpp(A, b, tol, maxI);
     
-    renderResultadosMatriciales(res, n);
+    renderMatricial(res);
   } finally {
     A.delete();
     b.delete();
-    // Limpiar memoria de vectores retornados por las estructuras C++
     if (res && res.x) res.x.delete();
     if (res && res.pasos) res.pasos.delete();
     if (res && res.tabla) res.tabla.delete();
@@ -218,33 +213,31 @@ function ejecutarMetodoMatricial() {
   }
 }
 
-function renderResultadosMatriciales(res, n) {
-  const card = document.getElementById('cardResultadosMatricial');
-  const errDiv = document.getElementById('alertaErrorMat');
-  const din = document.getElementById('resultadosDinamicosMatriciales');
+function renderMatricial(res) {
+  const card = document.getElementById('resMatricial');
+  const err = document.getElementById('errMatricial');
+  const sal = document.getElementById('salidaMatricial');
   
   card.classList.remove('hidden');
   if (!res.exito) {
-    errDiv.innerText = res.error_msg;
-    errDiv.classList.remove('hidden');
-    din.innerHTML = '';
+    err.innerText = res.error_msg || "Error en el cálculo.";
+    err.classList.remove('hidden');
+    sal.innerHTML = '';
     return;
   }
-  errDiv.classList.add('hidden');
+  err.classList.add('hidden');
   
-  let html = `<h4>Método ejecutado exitosamente</h4>`;
+  let html = `<p class="success-text">Cálculo exitoso.</p>`;
   
-  // Extraer vector solución general (Gauss, LU, Iterativos)
-  if(res.x || res.x_solucion || res.v_propio) {
-    let vec = res.x || res.x_solucion || res.v_propio;
-    html += `<div class="matrix-bracket-small">X = [`;
-    for(let i=0; i<vec.size(); i++) html += `<div class="vector-val">${vec.get(i).toFixed(6)}</div>`;
+  let vecSol = res.x || res.x_solucion || res.v_propio;
+  if(vecSol) {
+    html += `<h4>Vector Solución</h4><div class="matrix-bracket-small">[ `;
+    for(let i=0; i<vecSol.size(); i++) html += `<span class="vector-val">${vecSol.get(i).toFixed(6)}</span> `;
     html += `]</div>`;
   }
 
-  // Extraer Eigenvalor
-  if(res.lambda_max !== undefined) html += `<p>Eigenvalor dominante: <strong>${res.lambda_max.toFixed(6)}</strong></p>`;
-  if(res.lambda_min !== undefined) html += `<p>Eigenvalor mínimo: <strong>${res.lambda_min.toFixed(6)}</strong></p>`;
+  if(res.lambda_max !== undefined) html += `<h4>Eigenvalor dominante:</h4> <p>${res.lambda_max.toFixed(6)}</p>`;
+  if(res.lambda_min !== undefined) html += `<h4>Eigenvalor mínimo:</h4> <p>${res.lambda_min.toFixed(6)}</p>`;
 
-  din.innerHTML = html;
+  sal.innerHTML = html;
 }
