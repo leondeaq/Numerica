@@ -24,8 +24,17 @@ function cargarEjemploNewton() {
 }
 
 // 3. Navegación entre vistas/secciones
-function mostrarSeccion(seccion) {
-  alert(`Seleccionaste: ${seccion}. La Unidad 2 es la activa en esta demostración.`);
+function mostrarSeccion(idUnidad) {
+    // 1. Ocultar todas las unidades principales
+    document.getElementById('unidad2').classList.add('seccion-oculta');
+    document.getElementById('unidad5').classList.add('seccion-oculta');
+    
+    // (Si tienes los divs de unidad3 y unidad4, agrégalos aquí también)
+    // document.getElementById('unidad3').classList.add('seccion-oculta');
+    // document.getElementById('unidad4').classList.add('seccion-oculta');
+
+    // 2. Mostrar solo la unidad que se clickeó
+    document.getElementById(idUnidad).classList.remove('seccion-oculta');
 }
 
 function seleccionarMetodo(metodo) {
