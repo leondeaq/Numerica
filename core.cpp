@@ -7,11 +7,13 @@
 #include <cctype>
 #include <emscripten/bind.h>
 
-// Prueba de compilacion
-
-// Namespaces para simplificar el cÃ³digo sin prefijos std:: o emscripten::
+// Namespaces para simplificar el código sin prefijos std:: o emscripten::
 using namespace std;
 using namespace emscripten;
+
+// ==========================================================
+// ESTRUCTURAS - MÉTODO DE NEWTON
+// ==========================================================
 
 // Estructura de fila para la tabla de iteraciones
 struct FilaIteracion {
@@ -31,7 +33,31 @@ struct ResultadoNewton {
     vector<FilaIteracion> tabla;
 };
 
-// Evaluador parser simple y dinÃ¡mico para f(x)
+
+// ==========================================================
+// ESTRUCTURAS - MÉTODO DE LA POTENCIA
+// ==========================================================
+
+struct FilaIteracionPotencia {
+    int k;
+    double eigenvalor;
+    double error;
+};
+
+struct ResultadoPotencia {
+    bool exito;
+    double eigenvalor;
+    vector<double> eigenvector;
+    int iteraciones;
+    string error_msg;
+    vector<FilaIteracionPotencia> tabla;
+};
+
+// ==========================================================
+// LÓGICA Y PARSER MATEMÁTICO - MÉTODO DE NEWTON
+// ==========================================================
+
+// Evaluador parser simple y dinámico para f(x)
 class EvaluadorMatematico {
 private:
     string expr;
@@ -105,11 +131,11 @@ private:
                 if (name == "exp") return exp(arg);
                 if (name == "log" || name == "ln") return log(arg);
                 if (name == "abs") return abs(arg);
-                throw runtime_error("FunciÃ³n no soportada: " + name);
+                throw runtime_error("Función no soportada: " + name);
             }
             throw runtime_error("Variable no identificada: " + name);
         }
-        throw runtime_error("Sintaxis matemÃ¡tica invÃ¡lida.");
+        throw runtime_error("Sintaxis matemática inválida.");
     }
 
     double parse_power() {
@@ -132,7 +158,7 @@ private:
             } else if (c == '/') {
                 get();
                 double right = parse_power();
-                if (abs(right) < 1e-15) throw runtime_error("DivisiÃ³n entre cero.");
+                if (abs(right) < 1e-15) throw runtime_error("División entre cero.");
                 left /= right;
             } else {
                 break;
@@ -164,9 +190,9 @@ public:
     double evaluar(double x) {
         pos = 0;
         val_x = x;
-        if (expr.empty()) throw runtime_error("La funciÃ³n estÃ¡ vacÃ­a.");
+        if (expr.empty()) throw runtime_error("La función está vacía.");
         double res = parse_expression();
-        if (peek() != '\0') throw runtime_error("Error de sintaxis en la expresiÃ³n.");
+        if (peek() != '\0') throw runtime_error("Error de sintaxis en la expresión.");
         return res;
     }
 };
@@ -181,10 +207,10 @@ ResultadoNewton calcular_newton_cpp(string expr_str, double x0, double tol, int 
     res.exito = false;
 
     double xk = x0;
-    double h = 1e-7; // Paso para derivada numÃ©rica centrada
+    double h = 1e-7; // Paso para derivada numérica centrada
 
     try {
-        // Verificar validez inicial de la expresiÃ³n
+        // Verificar validez inicial de la expresión
         evaluar_f(expr_str, xk);
 
         for (int k = 1; k <= max_iter; ++k) {
@@ -220,8 +246,121 @@ ResultadoNewton calcular_newton_cpp(string expr_str, double x0, double tol, int 
     }
 }
 
-// VinculaciÃ³n Embind para WebAssembly
+// ==========================================================
+// LÓGICA - MÉTODO DE LA POTENCIA
+// ==========================================================
+
+ResultadoPotencia calcular_potencia_cpp(int n, vector<vector<double>> A, vector<double> x, double tolerancia, int maxIter) {
+    ResultadoPotencia res;
+    res.exito = false;
+    res.iteraciones = 0;
+    res.eigenvalor = 0.0;
+    
+    // Validaciones de seguridad para dimensiones
+    if (n < 1) {
+        res.error_msg = "Tamano no valido";
+        return res;
+    }
+    if (A.size() != static_cast<size_t>(n) || x.size() != static_cast<size_t>(n)) {
+        res.error_msg = "Las dimensiones de la matriz o el vector no coinciden con 'n'.";
+        return res;
+    }
+
+    vector<double> y(n, 0.0);
+    double mayor, lambda = 0.0, anterior = 0.0;
+    double error = 0.0, numerador, denominador;
+
+    for (int iter = 1; iter <= maxIter; iter++) {
+        
+        // Multiplicación de la matriz A por el vector actual x: y = A * x
+        for (int i = 0; i < n; i++) {
+            y[i] = 0;
+            for (int j = 0; j < n; j++) {
+                y[i] += A[i][j] * x[j];
+            }
+        }
+
+        // Buscar el elemento con mayor valor absoluto en el vector 'y'
+        mayor = 0;
+        for (int i = 0; i < n; i++) {
+            if (fabs(y[i]) > mayor) {
+                mayor = fabs(y[i]);
+            }
+        }
+
+        // Validación para evitar divisiones entre cero si se genera un vector nulo
+        if (mayor == 0) {
+            res.error_msg = "No se puede continuar: vector nulo.";
+            return res;
+        }
+
+        // Normalizar el vector: x = y / mayor
+        for (int i = 0; i < n; i++) {
+            x[i] = y[i] / mayor;
+        }
+
+        // Calcular nuevamente A * x usando el vector ya normalizado
+        for (int i = 0; i < n; i++) {
+            y[i] = 0;
+            for (int j = 0; j < n; j++) {
+                y[i] += A[i][j] * x[j];
+            }
+        }
+
+        // Aplicación del Cociente de Rayleigh para calcular el eigenvalor (lambda)
+        numerador = 0;
+        denominador = 0;
+        for (int i = 0; i < n; i++) {
+            numerador += x[i] * y[i];
+            denominador += x[i] * x[i];
+        }
+
+        if (denominador == 0) {
+            res.error_msg = "División por cero al calcular el cociente de Rayleigh.";
+            return res;
+        }
+
+        lambda = numerador / denominador;
+
+        // Cálculo del error aproximado a partir de la segunda iteración
+        if (iter > 1) {
+            error = fabs(lambda - anterior);
+        } else {
+            error = 0.0;
+        }
+
+        // Guardar fila para la tabla web
+        res.tabla.push_back({iter, lambda, error});
+
+        // Criterio de parada
+        if (iter > 1 && error <= tolerancia) {
+            res.exito = true;
+            res.eigenvalor = lambda;
+            res.eigenvector = x;
+            res.iteraciones = iter;
+            return res;
+        }
+
+        anterior = lambda;
+    }
+
+    res.exito = false;
+    res.error_msg = "Se alcanzo el maximo de iteraciones sin lograr la tolerancia deseada.";
+    res.eigenvalor = lambda;
+    res.eigenvector = x;
+    res.iteraciones = maxIter;
+    
+    return res;
+}
+
+// ==========================================================
+// VINCULACIÓN EMBIND (WebAssembly)
+// ==========================================================
+
 EMSCRIPTEN_BINDINGS(modulo_metodos) {
+    // ------------------------------------
+    // BINDINGS NEWTON
+    // ------------------------------------
     value_object<FilaIteracion>("FilaIteracion")
         .field("k", &FilaIteracion::k)
         .field("xk", &FilaIteracion::xk)
@@ -237,6 +376,28 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("tabla", &ResultadoNewton::tabla);
 
     register_vector<FilaIteracion>("VectorFilas");
-
     emscripten::function("calcular_newton_cpp", &calcular_newton_cpp);
+
+    // ------------------------------------
+    // BINDINGS POTENCIA
+    // ------------------------------------
+    value_object<FilaIteracionPotencia>("FilaIteracionPotencia")
+        .field("k", &FilaIteracionPotencia::k)
+        .field("eigenvalor", &FilaIteracionPotencia::eigenvalor)
+        .field("error", &FilaIteracionPotencia::error);
+
+    value_object<ResultadoPotencia>("ResultadoPotencia")
+        .field("exito", &ResultadoPotencia::exito)
+        .field("eigenvalor", &ResultadoPotencia::eigenvalor)
+        .field("eigenvector", &ResultadoPotencia::eigenvector)
+        .field("iteraciones", &ResultadoPotencia::iteraciones)
+        .field("error_msg", &ResultadoPotencia::error_msg)
+        .field("tabla", &ResultadoPotencia::tabla);
+
+    // Tipos std::vector nativos que se deben exportar a JS para el Método de la Potencia
+    register_vector<double>("VectorDouble");
+    register_vector<vector<double>>("VectorMatriz");
+    register_vector<FilaIteracionPotencia>("VectorFilasPotencia");
+
+    emscripten::function("calcular_potencia_cpp", &calcular_potencia_cpp);
 }
