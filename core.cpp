@@ -238,5 +238,5 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
 
     register_vector<FilaIteracion>("VectorFilas");
 
-    function("calcular_newton_cpp", &calcular_newton_cpp);
+    emscripten::function("calcular_newton_cpp", &calcular_newton_cpp);
 }
