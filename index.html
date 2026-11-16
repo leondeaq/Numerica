@@ -5,27 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Numerica - Calculadora de Métodos Numéricos</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Carga del WebAssembly compilado por Emscripten -->
+  
   <script>
     var Module = {
       onRuntimeInitialized: function () {
         console.log("Módulo WebAssembly (C++) listo.");
-        // Inicializar grilla de potencia por defecto cuando cargue
-        if (typeof generarGrillaPotencia === 'function') generarGrillaPotencia();
+        // Inicializar grillas por defecto
+        if (typeof inicializarGrillas === 'function') inicializarGrillas();
       }
     };
   </script>
+  <!-- Carga obligatoria del WASM ANTES de script.js -->
   <script src="core.js" defer></script>
+  <script src="script.js" defer></script>
+  
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <script src="script.js" defer></script>
-  <style>
-    /* Estilo auxiliar para ocultar secciones, asegúrate de que tu style.css maneje esto o usa inline/clases */
-    .seccion-oculta { display: none; }
-  </style>
 </head>
 <body>
-  <!-- Header / Barra Superior -->
   <header class="app-header">
     <div class="logo-container">
       <span class="logo-icon">∑</span>
@@ -33,228 +30,111 @@
       <span class="badge">MAC UNAM</span>
     </div>
     <nav class="top-nav">
-      <button class="nav-btn active" onclick="mostrarSeccion('unidad2')">Unidad 2</button>
-      <button class="nav-btn" onclick="mostrarSeccion('unidad3')">Unidad 3</button>
-      <button class="nav-btn" onclick="mostrarSeccion('unidad4')">Unidad 4</button>
-      <button class="nav-btn" onclick="mostrarSeccion('unidad5')">Unidad 5</button>
+      <button class="nav-btn active" onclick="mostrarSeccion('unidad2', this)">Unidad 2</button>
+      <button class="nav-btn" onclick="mostrarSeccion('unidad3', this)">Unidad 3</button>
+      <button class="nav-btn" onclick="mostrarSeccion('unidad4', this)">Unidad 4</button>
+      <button class="nav-btn" onclick="mostrarSeccion('unidad5', this)">Unidad 5</button>
       <button class="nav-btn btn-salir" onclick="confirmarSalida()">Salir</button>
     </nav>
   </header>
 
-  <!-- ========================================== -->
-  <!-- CONTENEDOR UNIDAD 2                        -->
-  <!-- ========================================== -->
+  <!-- UNIDAD 2: RAÍCES -->
   <div id="unidad2" class="main-layout">
-    <!-- Sidebar / Menú Lateral de Métodos U2 -->
     <aside class="sidebar">
-      <div class="sidebar-header">
-        <h3>Unidad 2: Raíces</h3>
-      </div>
+      <div class="sidebar-header"><h3>Unidad 2: Raíces</h3></div>
       <ul class="method-list">
-        <li class="method-item active" id="nav-newton">
-          <a href="#" onclick="seleccionarMetodo('newton')">Método de Newton-Raphson</a>
-        </li>
-        <li class="method-item disabled"><a href="#">Método de Bisección</a></li>
-        <li class="method-item disabled"><a href="#">Método de Secante</a></li>
+        <li class="method-item active"><a href="#" onclick="seleccionarMetodo('newton', 'unidad2', this)">Newton-Raphson</a></li>
+        <li class="method-item"><a href="#" onclick="seleccionarMetodo('biseccion', 'unidad2', this)">Bisección</a></li>
+        <li class="method-item"><a href="#" onclick="seleccionarMetodo('secante', 'unidad2', this)">Secante</a></li>
       </ul>
     </aside>
-
-    <!-- Contenido Principal U2 -->
     <main class="content-area">
-      <!-- VISTA: MÉTODO DE NEWTON-RAPHSON -->
-      <div id="vista-newton">
-        <section class="card theory-card">
-          <h2>Método de Newton-Raphson</h2>
-          <p>Es un algoritmo iterativo abierto para encontrar la raíz de una función $f(x) = 0$. Utiliza la primera derivada $f'(x)$ como la pendiente de la recta tangente en el punto $x_k$ para aproximarse a la raíz.</p>
-          <div class="formula-box">
-            $$x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)}$$
-          </div>
-        </section>
-
-        <section class="card form-card">
-          <div class="card-header-actions">
-            <h3>Entrada de Datos</h3>
-            <button class="btn btn-secondary" onclick="cargarEjemploNewton()"> Cargar Ejemplo</button>
-          </div>
-
-          <form id="formNewton" onsubmit="event.preventDefault(); ejecutarNewton();">
-            <div class="form-group">
-              <label for="inputFuncion">Función $f(x)$:</label>
-              <input type="text" id="inputFuncion" placeholder="Ej. x^3 - 2*x - 5" autocomplete="off" required>
-              <div class="math-keyboard" id="mathKeyboard">
-                <button type="button" class="key-btn" onclick="insertarSimbolo('x')">x</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('+')">+</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('-')">-</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('*')">*</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('/')">/</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('^')">xⁿ</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('(')">(</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo(')')">)</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('sqrt(')">√</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('sin(')">sin</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('cos(')">cos</button>
-                <button type="button" class="key-btn" onclick="insertarSimbolo('exp(')">eˣ</button>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group col-4">
-                <label for="inputX0">Valor Inicial ($x_0$):</label>
-                <input type="number" id="inputX0" step="any" placeholder="Ej. 2.0" required>
-              </div>
-              <div class="form-group col-4">
-                <label for="inputTol">Tolerancia ($\epsilon$):</label>
-                <input type="number" id="inputTol" step="any" value="0.0001" required>
-              </div>
-              <div class="form-group col-4">
-                <label for="inputMaxIter">Máx. Iteraciones:</label>
-                <input type="number" id="inputMaxIter" min="1" max="1000" value="100" required>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary btn-block">Calcular Raíz</button>
-            </div>
-          </form>
-        </section>
-
-        <section class="card results-card hidden" id="cardResultadosNewton">
-          <h3>Resultados del Cálculo</h3>
-          <div id="alertaErrorNewton" class="alert alert-danger hidden"></div>
-
-          <div class="metrics-grid">
-            <div class="metric-box">
-              <span class="metric-title">Raíz Aproximada ($x_r$)</span>
-              <span class="metric-value" id="valRaizNewton">-</span>
-            </div>
-            <div class="metric-box">
-              <span class="metric-title">Iteraciones Realizadas</span>
-              <span class="metric-value" id="valIteracionesNewton">-</span>
+      <!-- Vistas dinámicas inyectadas por JS o estructuradas aquí. Para mantener tu diseño, aquí unificados los formularios escalares -->
+      <section class="card form-card">
+        <h3 id="tituloMetodoU2">Método de Newton-Raphson</h3>
+        <form id="formU2" onsubmit="event.preventDefault(); ejecutarMetodoU2();">
+          <div class="form-group">
+            <label>Función $f(x)$:</label>
+            <input type="text" id="inputFuncion" placeholder="Ej. x^3 - 2*x - 5" required>
+            <div class="math-keyboard" id="mathKeyboard">
+              <button type="button" class="key-btn" onclick="insertarSimbolo('x')">x</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('+')">+</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('-')">-</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('*')">*</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('/')">/</button>
+              <button type="button" class="key-btn" onclick="insertarSimbolo('^')">xⁿ</button>
             </div>
           </div>
-
-          <div class="table-container">
-            <table class="table-custom">
-              <thead>
-                <tr>
-                  <th>$k$</th><th>$x_k$</th><th>$f(x_k)$</th><th>$f'(x_k)$</th><th>Error Relativo</th>
-                </tr>
-              </thead>
-              <tbody id="cuerpoTablaNewton"></tbody>
-            </table>
+          <div class="form-row">
+            <div class="form-group col-4" id="grpX0"><label>X0 (o Límite Inf):</label><input type="number" id="inputX0" step="any" required></div>
+            <div class="form-group col-4" id="grpX1"><label>X1 (o Límite Sup):</label><input type="number" id="inputX1" step="any"></div>
+            <div class="form-group col-4"><label>Tolerancia:</label><input type="number" id="inputTol" step="any" value="0.0001" required></div>
+            <div class="form-group col-4"><label>Máx Iteraciones:</label><input type="number" id="inputMaxIter" value="100" required></div>
           </div>
-        </section>
-      </div>
+          <button type="submit" class="btn btn-primary btn-block">Calcular</button>
+        </form>
+      </section>
+      
+      <section class="card results-card hidden" id="cardResultadosU2">
+        <h3>Resultados</h3>
+        <div id="alertaErrorU2" class="alert alert-danger hidden"></div>
+        <div class="metrics-grid">
+          <div class="metric-box"><span class="metric-title">Raíz</span><span class="metric-value" id="valRaizU2">-</span></div>
+          <div class="metric-box"><span class="metric-title">Iteraciones</span><span class="metric-value" id="valIterU2">-</span></div>
+        </div>
+        <div class="table-container">
+          <table class="table-custom">
+            <thead id="headTablaU2"></thead>
+            <tbody id="cuerpoTablaU2"></tbody>
+          </table>
+        </div>
+      </section>
     </main>
   </div>
 
-  <!-- ========================================== -->
-  <!-- CONTENEDOR UNIDAD 5                        -->
-  <!-- ========================================== -->
-  <div id="unidad5" class="main-layout seccion-oculta">
-    <!-- Sidebar / Menú Lateral de Métodos U5 -->
+  <!-- UNIDADES 3, 4 y 5: MATRICIALES (Diseño unificado de Grid) -->
+  <div id="unidadMatricial" class="main-layout seccion-oculta">
     <aside class="sidebar">
-      <div class="sidebar-header">
-        <h3>Unidad 5: Valores Propios</h3>
-      </div>
-      <ul class="method-list">
-        <li class="method-item active" id="nav-potencia">
-          <a href="#" onclick="seleccionarMetodo('potencia')">Método de la Potencia</a>
-        </li>
+      <div class="sidebar-header"><h3 id="tituloSidebarMatricial">Métodos Matriciales</h3></div>
+      <ul class="method-list" id="listaMetodosMatriciales">
+        <!-- Inyectado por JS según la unidad -->
       </ul>
     </aside>
-
-    <!-- Contenido Principal U5 -->
     <main class="content-area">
-      <!-- VISTA: MÉTODO DE LA POTENCIA -->
-      <div id="vista-potencia">
-        <section class="card theory-card">
-          <h2>Método de la Potencia</h2>
-          <p>Algoritmo numérico utilizado para aproximar el eigenvalor dominante (el de mayor magnitud) y su eigenvector asociado de una matriz cuadrada $A$. Funciona multiplicando iterativamente la matriz por un vector inicial y normalizándolo mediante el cociente de Rayleigh.</p>
-        </section>
-
-        <section class="card form-card">
-          <div class="card-header-actions">
-            <h3>Entrada de Datos (Matriz $A$ y Vector $x_0$)</h3>
-            <button class="btn btn-secondary" onclick="cargarEjemploPotencia()"> Cargar Ejemplo</button>
-          </div>
-
-          <form id="formPotencia" onsubmit="event.preventDefault(); ejecutarPotencia();">
-            
-            <div class="form-row">
-              <div class="form-group col-4">
-                <label for="inputN">Tamaño de la Matriz ($n \times n$):</label>
-                <input type="number" id="inputN" min="2" max="10" value="3" onchange="generarGrillaPotencia()" required>
-              </div>
-              <div class="form-group col-4">
-                <label for="inputTolPot">Tolerancia ($\epsilon$):</label>
-                <input type="number" id="inputTolPot" step="any" value="0.0001" required>
-              </div>
-              <div class="form-group col-4">
-                <label for="inputMaxIterPot">Máx. Iteraciones:</label>
-                <input type="number" id="inputMaxIterPot" min="1" max="1000" value="50" required>
-              </div>
+      <section class="card form-card">
+        <h3 id="tituloMetodoMatricial">Método</h3>
+        <form id="formMatricial" onsubmit="event.preventDefault(); ejecutarMetodoMatricial();">
+          <div class="form-row">
+            <div class="form-group col-4">
+              <label>Dimensión (n x n):</label>
+              <input type="number" id="inputN" min="2" max="10" value="3" onchange="generarGrillasMatriciales()" required>
             </div>
-
-            <!-- Contenedor dinámico para la grilla de la matriz y el vector -->
-            <div class="matrix-layout">
-              <div class="matrix-section">
-                <label>Matriz $A$</label>
-                <div id="matriz-A-container" class="matrix-bracket">
-                  <!-- Se llena con JS -->
-                </div>
-              </div>
-              <div class="matrix-section">
-                <label>Vector Inicial $x_0$</label>
-                <div id="vector-x-container" class="matrix-bracket">
-                  <!-- Se llena con JS -->
-                </div>
-              </div>
-            </div>
-
-            <div class="form-actions mt-3">
-              <button type="submit" class="btn btn-primary btn-block">Calcular Eigenvalor Dominante</button>
-            </div>
-          </form>
-        </section>
-
-        <section class="card results-card hidden" id="cardResultadosPotencia">
-          <h3>Resultados del Método de la Potencia</h3>
-          <div id="alertaErrorPotencia" class="alert alert-danger hidden"></div>
-
-          <div class="metrics-grid">
-            <div class="metric-box">
-              <span class="metric-title">Eigenvalor Dominante ($\lambda$)</span>
-              <span class="metric-value text-accent" id="valEigenvalor">-</span>
-            </div>
-            <div class="metric-box">
-              <span class="metric-title">Iteraciones</span>
-              <span class="metric-value" id="valIteracionesPotencia">-</span>
-            </div>
-            <div class="metric-box vector-box">
-              <span class="metric-title">Eigenvector Aproximado</span>
-              <div class="matrix-bracket-small" id="valEigenvector">
-                <!-- Se llena con JS -->
-              </div>
+            <div class="form-group col-4" id="grpTolMat">
+              <label>Tolerancia:</label>
+              <input type="number" id="inputTolMat" step="any" value="0.0001">
             </div>
           </div>
-
-          <div class="table-container">
-            <table class="table-custom">
-              <thead>
-                <tr>
-                  <th>Iteración ($k$)</th>
-                  <th>Eigenvalor ($\lambda_k$)</th>
-                  <th>Error Aproximado</th>
-                </tr>
-              </thead>
-              <tbody id="cuerpoTablaPotencia"></tbody>
-            </table>
+          
+          <div class="matrix-layout">
+            <div class="matrix-section">
+              <label>Matriz A</label>
+              <div id="gridMatrizA" class="matrix-bracket"></div>
+            </div>
+            <div class="matrix-section" id="seccionVectorB">
+              <label id="labelVectorB">Vector b / x0</label>
+              <div id="gridVectorB" class="matrix-bracket"></div>
+            </div>
           </div>
-        </section>
-      </div>
+          <button type="submit" class="btn btn-primary btn-block mt-3">Ejecutar Método</button>
+        </form>
+      </section>
+
+      <section class="card results-card hidden" id="cardResultadosMatricial">
+        <h3>Resultados</h3>
+        <div id="alertaErrorMat" class="alert alert-danger hidden"></div>
+        <div id="resultadosDinamicosMatriciales"></div>
+      </section>
     </main>
   </div>
-
 </body>
 </html>
