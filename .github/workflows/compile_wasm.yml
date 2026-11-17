@@ -1,0 +1,34 @@
+name: Compilar C++ a WebAssembly (Solo gh-pages)
+
+on:
+  push:
+    branches:
+      - gh-pages
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código fuente
+        uses: actions/checkout@v4
+
+      - name: Configurar Emscripten SDK
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.50
+          actions-cache-folder: 'emsdk-cache'
+
+      - name: Compilar C++ con emcc
+        run: |
+          emcc -O3 --bind core.cpp -o core.js -s WASM=1 -s ALLOW_MEMORY_GROWTH=1
+
+      - name: Guardar (Commit) de los archivos compilados en la misma rama
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add core.js core.wasm
+          git commit -m "Auto-compilación de WASM" || echo "No hay cambios para guardar"
+          git push
