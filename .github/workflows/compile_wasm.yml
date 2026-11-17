@@ -22,7 +22,7 @@ jobs:
 
       - name: Compilar C++ con emcc
         run: |
-          emcc -O3 --bind core.cpp -o core.js -s WASM=1 -s ALLOW_MEMORY_GROWTH=1
+          em++ -O3 --bind core.cpp -o core.js -s WASM=1 -s ALLOW_MEMORY_GROWTH=1
 
       - name: Guardar (Commit) de los archivos compilados en la misma rama
         run: |
