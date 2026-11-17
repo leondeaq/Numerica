@@ -4,7 +4,7 @@
 //
 // Compilación sugerida:
 //   emcc core.cpp -o core.js -lembind -O2 -s MODULARIZE=1 -s EXPORT_NAME="createModule" -s ALLOW_MEMORY_GROWTH=1
-//
+//   Nota: Solo si se decide compilar localmente.
 // Contenido:
 //   UNIDAD 2: Bisección, Newton-Raphson, Secante
 //   UNIDAD 3: Gauss-Jordan, Doolittle (LU), Crout (LU)
