@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - gh-pages                  # Se dispara al subir cambios a la rama por defecto
-    paths:
-      - 'core.cpp'            # Se activa si cambia la logica de C++
-      - 'index.html'
-      - 'style.css'
-      - 'script.js'
 
 permissions:
   contents: write             # Otorga permisos de escritura para publicar en gh-pages
