@@ -3,7 +3,7 @@ name: Compilar C++ a WebAssembly y Publicar en GitHub Pages
 on:
   push:
     branches:
-      - main                  # Se dispara al subir cambios a la rama principal
+      - gh-pages                  # Se dispara al subir cambios a la rama por defecto
     paths:
       - 'core.cpp'            # Se activa si cambia la logica de C++
       - 'index.html'
