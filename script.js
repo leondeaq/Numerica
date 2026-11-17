@@ -136,6 +136,7 @@ function ejecutarU2(metodo) {
     }
     renderResultadosU2(res);
   } catch (e) {
+    console.error("Bug detectado:", e);
     mostrarErrorU2("Error en la ejecución. Revisa los datos de entrada.");
   } finally {
     if (res && res.tabla) res.tabla.delete();
