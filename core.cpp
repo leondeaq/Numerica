@@ -1470,7 +1470,7 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("error_msg", &ResultadoBiseccion::error_msg)
         .field("tabla", &ResultadoBiseccion::tabla);
 
-    function("calcular_biseccion_cpp", &calcular_biseccion_cpp);
+    emscripten::function("calcular_biseccion_cpp", &calcular_biseccion_cpp);
 
     // Newton-Raphson
     value_object<FilaIteracion>("FilaIteracion")
@@ -1489,7 +1489,7 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("error_msg", &ResultadoNewton::error_msg)
         .field("tabla", &ResultadoNewton::tabla);
 
-    function("calcular_newton_cpp", &calcular_newton_cpp);
+    emscripten::function("calcular_newton_cpp", &calcular_newton_cpp);
 
     // Secante
     value_object<FilaIteracionSecante>("FilaIteracionSecante")
@@ -1507,7 +1507,7 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("error_msg", &ResultadoSecante::error_msg)
         .field("tabla", &ResultadoSecante::tabla);
 
-    function("calcular_secante_cpp", &calcular_secante_cpp);
+    emscripten::function("calcular_secante_cpp", &calcular_secante_cpp);
 
     // ---------------------------- UNIDAD 3 ----------------------------
     // Gauss-Jordan
@@ -1524,7 +1524,7 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("x", &ResultadoGaussJordan::x)
         .field("pasos", &ResultadoGaussJordan::pasos);
 
-    function("calcular_gauss_jordan_cpp", &calcular_gauss_jordan_cpp);
+    emscripten::function("calcular_gauss_jordan_cpp", &calcular_gauss_jordan_cpp);
 
     // Doolittle
     value_object<ResultadoDoolittle>("ResultadoDoolittle")
@@ -1535,7 +1535,7 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("y", &ResultadoDoolittle::y)
         .field("x", &ResultadoDoolittle::x);
 
-    function("calcular_doolittle_cpp", &calcular_doolittle_cpp);
+    emscripten::function("calcular_doolittle_cpp", &calcular_doolittle_cpp);
 
     // Crout
     value_object<ResultadoCrout>("ResultadoCrout")
@@ -1546,7 +1546,7 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("y", &ResultadoCrout::y)
         .field("x", &ResultadoCrout::x);
 
-    function("calcular_crout_cpp", &calcular_crout_cpp);
+    emscripten::function("calcular_crout_cpp", &calcular_crout_cpp);
 
     // ---------------------------- UNIDAD 4 ----------------------------
     // Fila compartida por Jacobi y Gauss-Seidel
@@ -1565,7 +1565,7 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("tabla", &ResultadoJacobi::tabla)
         .field("error_msg", &ResultadoJacobi::error_msg);
 
-    function("calcular_jacobi_cpp", &calcular_jacobi_cpp);
+    emscripten::function("calcular_jacobi_cpp", &calcular_jacobi_cpp);
 
     // Gauss-Seidel
     value_object<ResultadoGaussSeidel>("ResultadoGaussSeidel")
@@ -1575,7 +1575,7 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("tabla", &ResultadoGaussSeidel::tabla)
         .field("error_msg", &ResultadoGaussSeidel::error_msg);
 
-    function("calcular_gauss_seidel_cpp", &calcular_gauss_seidel_cpp);
+    emscripten::function("calcular_gauss_seidel_cpp", &calcular_gauss_seidel_cpp);
 
     // ---------------------------- UNIDAD 5 ----------------------------
     // Fila compartida por Potencia y Potencia Inversa
@@ -1595,7 +1595,7 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("error_msg", &ResultadoPotencia::error_msg)
         .field("tabla", &ResultadoPotencia::tabla);
 
-    function("calcular_potencia_cpp", &calcular_potencia_cpp);
+    emscripten::function("calcular_potencia_cpp", &calcular_potencia_cpp);
 
     // Potencia Inversa
     value_object<ResultadoPotenciaInversa>("ResultadoPotenciaInversa")
@@ -1606,5 +1606,5 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("error_msg", &ResultadoPotenciaInversa::error_msg)
         .field("tabla", &ResultadoPotenciaInversa::tabla);
 
-    function("calcular_potencia_inversa_cpp", &calcular_potencia_inversa_cpp);
+    emscripten::function("calcular_potencia_inversa_cpp", &calcular_potencia_inversa_cpp);
 }
