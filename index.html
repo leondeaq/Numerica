@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Numerica - Calculadora de Métodos Numéricos</title>
+  <title>NUMERICA - Calculadora de Métodos Numéricos</title>
   <link rel="stylesheet" href="style.css">
   <script>
     var Module = {
@@ -21,7 +21,7 @@
   <header class="app-header">
     <div class="logo-container">
       <span class="logo-icon">∑</span>
-      <h1 class="logo-title">Numérica</h1>
+      <h1 class="logo-title">NUMERICA</h1>
       <span class="badge">MAC UNAM</span>
     </div>
     <nav class="top-nav">
@@ -38,7 +38,7 @@
   <!-- ========================================== -->
   <div id="unidad2" class="main-layout">
     <aside class="sidebar">
-      <div class="sidebar-header"><h3>Unidad 2: Raíces</h3></div>
+      <div class="sidebar-header"><h3>Unidad 2</h3></div>
       <ul class="method-list">
         <li class="method-item active" id="nav-newton"><a href="#" onclick="cambiarVista('unidad2', 'newton', this)">Newton-Raphson</a></li>
         <li class="method-item" id="nav-biseccion"><a href="#" onclick="cambiarVista('unidad2', 'biseccion', this)">Bisección</a></li>
@@ -46,16 +46,43 @@
       </ul>
     </aside>
     <main class="content-area">
+      
+
+      <!-- VISTA BISECCIÓN -->
+      <div id="vista-biseccion" class="vista-metodo hidden">
+        <section class="card theory-card">
+          <h2>Método de Bisección</h2>
+          <p>Se programa una de las ecuaciones no lineales visto en clase. Se ingresa un valor inicial para poder calcular la solución de una ecuación no lineal y el programa presenta la solución, 
+            genera tabla de datos para revisar la solución.</p>
+        </section>
+        <section class="card form-card">
+          <form onsubmit="event.preventDefault(); ejecutarU2('biseccion');">
+            <div class="form-group">
+              <label>Función f(x):</label>
+              <input type="text" id="fn_biseccion" placeholder="Ej. x^3 - 2*x - 5" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-4"><label>Límite Inferior (a):</label><input type="number" id="a_bis" step="any" required></div>
+              <div class="form-group col-4"><label>Límite Superior (b):</label><input type="number" id="b_bis" step="any" required></div>
+              <div class="form-group col-4"><label>Tolerancia:</label><input type="number" id="tol_bis" step="any" value="0.0001" required></div>
+              <div class="form-group col-4"><label>Máx. Iter:</label><input type="number" id="iter_bis" value="100" required></div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Calcular Raíz</button>
+          </form>
+        </section>
+      </div>
+
       <!-- VISTA NEWTON -->
       <div id="vista-newton" class="vista-metodo">
         <section class="card theory-card">
           <h2>Método de Newton-Raphson</h2>
-          <p>Se programa una de las ecuaciones no lineales visto en clase. Se ingresa un valor inicial para poder calcular la solución de la ecuación no lineal y el programa presenta la solución, se genera tabla de datos para revisar solución.</p>
+          <p>Se programa una de las ecuaciones no lineales visto en clase. Se ingresa un valor inicial para poder calcular la solución de la ecuación no lineal 
+            y el programa presenta la solución, se genera tabla de datos para revisar solución.</p>
         </section>
         <section class="card form-card">
           <form onsubmit="event.preventDefault(); ejecutarU2('newton');">
             <div class="form-group">
-              <label>Función $f(x)$:</label>
+              <label>Función f(x):</label>
               <input type="text" id="fn_newton" placeholder="Ej. x^3 - 2*x - 5" required>
             </div>
             <div class="form-row">
@@ -67,35 +94,13 @@
           </form>
         </section>
       </div>
-
-      <!-- VISTA BISECCIÓN -->
-      <div id="vista-biseccion" class="vista-metodo hidden">
-        <section class="card theory-card">
-          <h2>Método de Bisección</h2>
-          <p>Se programa una de las ecuaciones no lineales visto en clase. Se ingresa un valor inicial para poder calcular la solución de una ecuación no lineal y el programa presenta la solución, genera tabla de datos para revisar la solución.</p>
-        </section>
-        <section class="card form-card">
-          <form onsubmit="event.preventDefault(); ejecutarU2('biseccion');">
-            <div class="form-group">
-              <label>Función $f(x)$:</label>
-              <input type="text" id="fn_biseccion" placeholder="Ej. x^3 - 2*x - 5" required>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-4"><label>Límite Inferior ($a$):</label><input type="number" id="a_bis" step="any" required></div>
-              <div class="form-group col-4"><label>Límite Superior ($b$):</label><input type="number" id="b_bis" step="any" required></div>
-              <div class="form-group col-4"><label>Tolerancia:</label><input type="number" id="tol_bis" step="any" value="0.0001" required></div>
-              <div class="form-group col-4"><label>Máx. Iter:</label><input type="number" id="iter_bis" value="100" required></div>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Calcular Raíz</button>
-          </form>
-        </section>
-      </div>
-
+      
       <!-- VISTA SECANTE -->
       <div id="vista-secante" class="vista-metodo hidden">
         <section class="card theory-card">
           <h2>Método de la Secante</h2>
-          <p>Se programa una de las ecuaciones no lineales visto en clase. Se ingresan dos valores iniciales para poder calcular la solución de una ecuación no lineal y el programa presenta la solución, se genera tabla de datos para revisar solución.</p>
+          <p>Se programa una de las ecuaciones no lineales visto en clase. Se ingresan dos valores iniciales para poder calcular la solución de una ecuación no lineal 
+            y el programa presenta la solución, se genera tabla de datos para revisar solución.</p>
         </section>
         <section class="card form-card">
           <form onsubmit="event.preventDefault(); ejecutarU2('secante');">
@@ -104,8 +109,8 @@
               <input type="text" id="fn_secante" placeholder="Ej. x^3 - 2*x - 5" required>
             </div>
             <div class="form-row">
-              <div class="form-group col-4"><label>$x_0$:</label><input type="number" id="x0_sec" step="any" required></div>
-              <div class="form-group col-4"><label>$x_1$:</label><input type="number" id="x1_sec" step="any" required></div>
+              <div class="form-group col-4"><label>x_0:</label><input type="number" id="x0_sec" step="any" required></div>
+              <div class="form-group col-4"><label>x_1:</label><input type="number" id="x1_sec" step="any" required></div>
               <div class="form-group col-4"><label>Tolerancia:</label><input type="number" id="tol_sec" step="any" value="0.0001" required></div>
               <div class="form-group col-4"><label>Máx. Iter:</label><input type="number" id="iter_sec" value="100" required></div>
             </div>
@@ -152,18 +157,18 @@
           <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Gauss-Jordan.</p>
         </section>
       </div>
-      <!-- VISTA DOOLITTLE -->
-      <div id="vista-doolittle" class="vista-metodo hidden">
+      <!-- VISTA JACOBI -->
+      <div id="vista-jacobi" class="vista-metodo">
         <section class="card theory-card">
-          <h2>Factorización LU (Doolittle)</h2>
-          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Doolittle.</p>
+          <h2>Jacobi</h2>
+          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Jacobi.</p>
         </section>
       </div>
-      <!-- VISTA CROUT -->
-      <div id="vista-crout" class="vista-metodo hidden">
+      <!-- VISTA GAUSS-SEIDEL -->
+      <div id="vista-gaussseidel" class="vista-metodo hidden">
         <section class="card theory-card">
-          <h2>Factorización LU (Crout)</h2>
-          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Crout.</p>
+          <h2>Gauss-Seidel</h2>
+          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Gauss-Seidel</p>
         </section>
       </div>
 
@@ -202,23 +207,25 @@
   <!-- ========================================== -->
   <div id="unidad4" class="main-layout hidden">
     <aside class="sidebar">
-      <div class="sidebar-header"><h3>Unidad 4: Iterativos</h3></div>
+      <div class="sidebar-header"><h3>Unidad 4</h3></div>
       <ul class="method-list">
         <li class="method-item active"><a href="#" onclick="cambiarVista('unidad4', 'jacobi', this)">Jacobi</a></li>
         <li class="method-item"><a href="#" onclick="cambiarVista('unidad4', 'gaussseidel', this)">Gauss-Seidel</a></li>
       </ul>
     </aside>
     <main class="content-area">
-      <div id="vista-jacobi" class="vista-metodo">
+      <!-- VISTA DOOLITTLE -->
+      <div id="vista-doolittle" class="vista-metodo hidden">
         <section class="card theory-card">
-          <h2>Jacobi</h2>
-          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Jacobi.</p>
+          <h2>Factorización LU (Doolittle)</h2>
+          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Doolittle.</p>
         </section>
       </div>
-      <div id="vista-gaussseidel" class="vista-metodo hidden">
+      <!-- VISTA CROUT -->
+      <div id="vista-crout" class="vista-metodo hidden">
         <section class="card theory-card">
-          <h2>Gauss-Seidel</h2>
-          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Gauss-Seidel</p>
+          <h2>Factorización LU (Crout)</h2>
+          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Crout.</p>
         </section>
       </div>
       <!-- Reutiliza el formulario y resultados matriciales de JS -->
