@@ -100,6 +100,23 @@
           <form onsubmit="event.preventDefault(); ejecutarU2('newton');">
             <div class="form-group">
               <label>Función f(x):</label>
+
+              <!-- Teclado Matemático de Accesos Rápidos -->
+              <div class="math-keyboard">
+                <button type="button" class="key-btn" onclick="insertarSimbolo('x')">x</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('+')">+</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('-')">-</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('*')">*</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('/')">/</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('^')">xⁿ</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('(')">(</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo(')')">)</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('sqrt(')">√</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('sin(')">sin</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('cos(')">cos</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('exp(')">eˣ</button>
+              </div>
+              
               <input type="text" id="fn_newton" placeholder="Ej. x^3 - 2*x - 5" required>
             </div>
             <div class="form-row">
@@ -123,6 +140,23 @@
           <form onsubmit="event.preventDefault(); ejecutarU2('secante');">
             <div class="form-group">
               <label>Función $f(x)$:</label>
+
+              <!-- Teclado Matemático de Accesos Rápidos -->
+              <div class="math-keyboard">
+                <button type="button" class="key-btn" onclick="insertarSimbolo('x')">x</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('+')">+</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('-')">-</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('*')">*</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('/')">/</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('^')">xⁿ</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('(')">(</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo(')')">)</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('sqrt(')">√</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('sin(')">sin</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('cos(')">cos</button>
+                <button type="button" class="key-btn" onclick="insertarSimbolo('exp(')">eˣ</button>
+              </div>
+              
               <input type="text" id="fn_secante" placeholder="Ej. x^3 - 2*x - 5" required>
             </div>
             <div class="form-row">
