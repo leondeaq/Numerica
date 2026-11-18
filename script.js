@@ -124,6 +124,10 @@ function ejecutarU2(metodo) {
       const x0 = parseFloat(document.getElementById('x0_newton').value);
       const tol = parseFloat(document.getElementById('tol_newton').value);
       const iter = parseInt(document.getElementById('iter_newton').value);
+      
+      // Validar antes de ejecutar
+      if (!sonEntradasValidas(tol, iter)) return; 
+      
       res = Module.calcular_newton_cpp(f, x0, tol, iter);
     } 
     else if (metodo === 'biseccion') {
@@ -132,6 +136,10 @@ function ejecutarU2(metodo) {
       const b = parseFloat(document.getElementById('b_bis').value);
       const tol = parseFloat(document.getElementById('tol_bis').value);
       const iter = parseInt(document.getElementById('iter_bis').value);
+      
+      // Validar antes de ejecutar
+      if (!sonEntradasValidas(tol, iter)) return; 
+      
       res = Module.calcular_biseccion_cpp(f, a, b, tol, iter);
     }
     else if (metodo === 'secante') {
@@ -140,6 +148,10 @@ function ejecutarU2(metodo) {
       const x1 = parseFloat(document.getElementById('x1_sec').value);
       const tol = parseFloat(document.getElementById('tol_sec').value);
       const iter = parseInt(document.getElementById('iter_sec').value);
+      
+      // Validar antes de ejecutar
+      if (!sonEntradasValidas(tol, iter)) return; 
+      
       res = Module.calcular_secante_cpp(f, x0, x1, tol, iter);
     }
     renderResultadosU2(res);
@@ -275,4 +287,20 @@ function insertarSimbolo(simbolo) {
     input.focus();
     input.selectionStart = input.selectionEnd = inicio + simbolo.length;
   }
+}
+
+function sonEntradasValidas(tolerancia, iteraciones) {
+    // Validar Tolerancia
+    if (tolerancia < 0.00000001 || tolerancia > 0.1) {
+        alert("Error: La tolerancia debe ser un valor positivo entre 0.00000001 y 0.1");
+        return false;
+    }
+    
+    // Validar Iteraciones
+    if (iteraciones < 1 || iteraciones > 1000 || !Number.isInteger(iteraciones)) {
+        alert("Error: Las iteraciones deben ser un número entero entre 1 y 1000.");
+        return false;
+    }
+    
+    return true;
 }
