@@ -28,7 +28,7 @@ function mostrarUnidad(idUnidad, btn) {
   if(idUnidad !== 'unidad2') {
     const formCard = document.querySelector('.form-card:has(#dimN)');
     const resCard = document.querySelector('#resMatricial');
-    document.querySelector(`#${idUnidad} .content-area`).insertBefore(formCard, document.querySelector(`#${idUnidad} .content-area`).lastElementChild);
+    document.querySelector(`#${idUnidad} .content-area`).appendChild(formCard);
     document.querySelector(`#${idUnidad} .content-area`).appendChild(resCard);
     generarGrillas();
   }
