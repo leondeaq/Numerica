@@ -74,7 +74,16 @@ function confirmarSalida() {
 // ==========================================
 
 function generarGrillas() {
-  const n = parseInt(document.getElementById('dimN').value) || 3;
+  const inputN = document.getElementById('dimN');
+  let n = parseInt(inputN.value);
+
+  // Validar antes de dibujar la cuadrícula
+  if (isNaN(n) || n < 2 || n > 10) {
+    alert("Por favor, ingresa una dimensión válida entre 2 y 10.");
+    n = 3; // Restaurar a un valor seguro
+    inputN.value = 3;
+  }
+
   const gridA = document.getElementById('gridA');
   const gridB = document.getElementById('gridB');
   
@@ -203,6 +212,13 @@ function ejecutarMatricial() {
   if (typeof Module === 'undefined') return alert("Cargando módulo...");
 
   const n = parseInt(document.getElementById('dimN').value);
+
+  // Validar antes de mandar a C++
+  if (isNaN(n) || n < 2 || n > 10) {
+      alert("Error: La dimensión de la matriz debe estar entre 2 y 10.");
+      return; // Detiene la ejecución
+  }
+  
   const tol = parseFloat(document.getElementById('tolMat').value) || 0.0001;
   const maxI = 100;
   
