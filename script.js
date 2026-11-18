@@ -24,19 +24,22 @@ function mostrarUnidad(idUnidad, btn) {
 
   const primerEnlace = document.querySelector(`#${idUnidad} .method-list .method-item a`);
   if (primerEnlace) primerEnlace.click();
-
+  
   if(idUnidad !== 'unidad2') {
-    // Usamos los IDs exactos para que no haya fallos al buscar
-    const formCard = document.getElementById('form-matricial');
-    const resCard = document.getElementById('resMatricial');
+    // Usamos tu selector original que ya funcionaba perfecto
+    const formCard = document.querySelector('.form-card:has(#dimN)');
+    const resCard = document.querySelector('#resMatricial');
     const contenedor = document.querySelector(`#${idUnidad} .content-area`);
     
-    // appendChild GARANTIZA que se inserten al final de todo el contenedor
-    contenedor.appendChild(formCard);
-    contenedor.appendChild(resCard);
+    // Lo movemos al final del contenedor actual
+    if(formCard && resCard) {
+      contenedor.appendChild(formCard);
+      contenedor.appendChild(resCard);
+    }
     
     generarGrillas();
   }
+  
 }
 
 // Cambiar entre métodos desde el menú lateral
