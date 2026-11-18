@@ -3,8 +3,8 @@
  * JavaScript principal para manejo de la interfaz y puente con WebAssembly (Emscripten / C++)
  */
 
-let unidadActiva = 'unidad2';
-let metodoActivo = 'biseccion';
+let unidadActiva = 'inicio';
+let metodoActivo = 'bienvenida';
 
 // ==========================================
 // 1. NAVEGACIÓN Y UI
@@ -15,7 +15,8 @@ function mostrarUnidad(idUnidad, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   
-  ['unidad2', 'unidad3', 'unidad4', 'unidad5'].forEach(u => {
+  // Agregar 'inicio' a este arreglo para que se oculte correctamente cuando cambies de pestaña
+  ['inicio', 'unidad2', 'unidad3', 'unidad4', 'unidad5'].forEach(u => {
     document.getElementById(u).classList.add('hidden');
   });
   
