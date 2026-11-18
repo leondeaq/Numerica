@@ -250,3 +250,29 @@ function renderMatricial(res) {
 
   sal.innerHTML = html;
 }
+
+// ==========================================
+// 5. TECLADO MATEMÁTICO (U2)
+// ==========================================
+function insertarSimbolo(simbolo) {
+  let inputId = '';
+  
+  // Identificar qué input está activo actualmente
+  if (metodoActivo === 'biseccion') inputId = 'fn_biseccion';
+  else if (metodoActivo === 'newton') inputId = 'fn_newton';
+  else if (metodoActivo === 'secante') inputId = 'fn_secante';
+
+  if (inputId) {
+    const input = document.getElementById(inputId);
+    const inicio = input.selectionStart;
+    const fin = input.selectionEnd;
+    const texto = input.value;
+    
+    // Insertar el símbolo donde esté el cursor
+    input.value = texto.slice(0, inicio) + simbolo + texto.slice(fin);
+    
+    // Regresar el foco al input y mover el cursor después del símbolo
+    input.focus();
+    input.selectionStart = input.selectionEnd = inicio + simbolo.length;
+  }
+}
