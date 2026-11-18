@@ -81,8 +81,10 @@
             <div class="form-row">
               <div class="form-group col-4"><label>Límite Inferior (a):</label><input type="number" id="a_bis" step="any" required></div>
               <div class="form-group col-4"><label>Límite Superior (b):</label><input type="number" id="b_bis" step="any" required></div>
-              <div class="form-group col-4"><label>Tolerancia:</label><input type="number" id="tol_bis" step="any" value="0.0001" required></div>
-              <div class="form-group col-4"><label>Máx. Iter:</label><input type="number" id="iter_bis" value="100" required></div>
+              <div class="form-group col-4"><label>Tolerancia:</label>
+                <input type="number" id="tol_bis" min="0.00000001" max="0.1" step="any" placeholder="0.0001" required></div>
+              <div class="form-group col-4"><label>Máx. Iter:</label>
+                <input type="number" id="iter_bis" min="1" max="1000" step="1" placeholder="100" required></div>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Calcular Raíz</button>
           </form>
@@ -120,9 +122,11 @@
               <input type="text" id="fn_newton" placeholder="Ej. x^3 - 2*x - 5" required>
             </div>
             <div class="form-row">
-              <div class="form-group col-4"><label>Valor Inicial ($x_0$):</label><input type="number" id="x0_newton" step="any" required></div>
-              <div class="form-group col-4"><label>Tolerancia:</label><input type="number" id="tol_newton" step="any" value="0.0001" required></div>
-              <div class="form-group col-4"><label>Máx. Iteraciones:</label><input type="number" id="iter_newton" value="100" required></div>
+              <div class="form-group col-4"><label>Valor Inicial (x_0):</label><input type="number" id="x0_newton" step="any" required></div>
+              <div class="form-group col-4"><label>Tolerancia:</label>
+                <input type="number" id="tol_newton" min="0.00000001" max="0.1" step="any" placeholder="0.0001" required></div>
+              <div class="form-group col-4"><label>Máx. Iteraciones:</label>
+                <input type="number" id="iter_newton" min="1" max="1000" step="1" placeholder="100" required></div>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Calcular Raíz</button>
           </form>
@@ -139,7 +143,7 @@
         <section class="card form-card">
           <form onsubmit="event.preventDefault(); ejecutarU2('secante');">
             <div class="form-group">
-              <label>Función $f(x)$:</label>
+              <label>Función f(x):</label>
 
               <!-- Teclado Matemático de Accesos Rápidos -->
               <div class="math-keyboard">
@@ -162,8 +166,10 @@
             <div class="form-row">
               <div class="form-group col-4"><label>x_0:</label><input type="number" id="x0_sec" step="any" required></div>
               <div class="form-group col-4"><label>x_1:</label><input type="number" id="x1_sec" step="any" required></div>
-              <div class="form-group col-4"><label>Tolerancia:</label><input type="number" id="tol_sec" step="any" value="0.0001" required></div>
-              <div class="form-group col-4"><label>Máx. Iter:</label><input type="number" id="iter_sec" value="100" required></div>
+              <div class="form-group col-4"><label>Tolerancia:</label>
+                <input type="number" id="tol_sec" min="0.00000001" max="0.1" step="any" placeholder="0.0001" required></div>
+              <div class="form-group col-4"><label>Máx. Iter:</label>
+                <input type="number" id="iter_newton" min="1" max="1000" step="1" placeholder="100" required></div>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Calcular Raíz</button>
           </form>
