@@ -219,7 +219,14 @@ function ejecutarMatricial() {
       return; // Detiene la ejecución
   }
   
-  const tol = parseFloat(document.getElementById('tolMat').value) || 0.0001;
+  const tol = parseFloat(document.getElementById('tolMat').value);
+
+  // Validar la tolerancia (Aplica para Jacobi, Gauss-Seidel y Potencia)
+  if (isNaN(tol) || tol < 0.00000001 || tol > 0.1) {
+      alert("Error: La tolerancia debe ser un valor positivo entre 0.00000001 y 0.1");
+      return;
+  }
+  
   const maxI = 100;
   
   const A = leerMatriz(n);
