@@ -4,7 +4,7 @@
  */
 
 let unidadActiva = 'unidad2';
-let metodoActivo = 'newton';
+let metodoActivo = 'biseccion';
 
 // ==========================================
 // 1. NAVEGACIÓN Y UI
