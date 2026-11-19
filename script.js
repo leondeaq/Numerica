@@ -280,12 +280,16 @@ function renderMatricial(res) {
   
   let vecSol = res.x || res.x_solucion || res.v_propio;
   if(vecSol) {
-    html += `<h4>Vector Solución</h4><div class="matrix-bracket-small">[ `;
+    // 1. Validar dinámicamente si estamos en Eigenvalores (Unidad 5)
+    let tituloVector = (unidadActiva === 'unidad5') ? "Vector Propio" : "Vector Solución";
+    
+    // 2. Imprimir el título correcto
+    html += `<h4>${tituloVector}</h4><div class="matrix-bracket-small">[ `;
     for(let i=0; i<vecSol.size(); i++) html += `<span class="vector-val">${vecSol.get(i).toFixed(6)}</span> `;
     html += `]</div>`;
   }
 
-  if(res.lambda_max !== undefined) html += `<h4>Eigenvalor máximo:</h4> <p>${res.lambda_max.toFixed(6)}</p>`;
+  if(res.lambda_max !== undefined) html += `<h4>Eigenvalor dominante:</h4> <p>${res.lambda_max.toFixed(6)}</p>`;
   if(res.lambda_min !== undefined) html += `<h4>Eigenvalor mínimo:</h4> <p>${res.lambda_min.toFixed(6)}</p>`;
 
   sal.innerHTML = html;
