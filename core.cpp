@@ -455,6 +455,7 @@ ResultadoBiseccion calcular_biseccion_cpp(string expr_str, double a, double b, d
             // 4. Reducir el intervalo a la mitad donde hay cambio de signo
             if ((fa < 0 && fx > 0) || (fa > 0 && fx < 0)) {
                 b = xr;
+                fb = fx;
             } else {
                 a = xr;
                 fa = fx;
@@ -478,8 +479,8 @@ ResultadoBiseccion calcular_biseccion_cpp(string expr_str, double a, double b, d
 struct FilaIteracion {
     int k;
     double xk;
-    double f_xk;
-    double df_xk;
+    double fx;
+    double dfx;
     double error;
 };
 
@@ -553,9 +554,11 @@ ResultadoNewton calcular_newton_cpp(string expr_str, double x0, double tol, int 
 
 struct FilaIteracionSecante {
     int k;
+    double x_prev;
     double xk;
-    double f_xk;
-    double error;   // |f(xk)|; en las filas iniciales (k = 0 y 1) vale 0
+    double fx_prev;
+    double fx;
+    double error;    // |f(xk)|; en las filas iniciales (k = 0 y 1) vale 0
 };
 
 struct ResultadoSecante {
@@ -580,8 +583,9 @@ ResultadoSecante calcular_secante_cpp(string expr_str, double x0, double x1, dou
         double fx1 = evaluar_f(expr_str, x1);
 
         // Filas con los dos valores iniciales
-        res.tabla.push_back({0, x0, fx0, 0});
-        res.tabla.push_back({1, x1, fx1, 0});
+        // En la fila 0, no hay un x_prev real, repetimos x0 o ponemos 0. Lo ideal:
+        res.tabla.push_back({0, x0, x0, fx0, fx0, 0});
+        res.tabla.push_back({1, x0, x1, fx0, fx1, 0});
 
         for (int i = 1; i <= max_iter; i++) {
             double denominador = fx1 - fx0;
@@ -596,7 +600,7 @@ ResultadoSecante calcular_secante_cpp(string expr_str, double x0, double x1, dou
             double fx2 = evaluar_f(expr_str, x2);
             double error = fabs(fx2);
 
-            res.tabla.push_back({i + 1, x2, fx2, error});
+            res.tabla.push_back({i + 1, x1, x2, fx1, fx2, error});
 
             res.raiz = x2;
             res.iteraciones = i;
@@ -623,9 +627,9 @@ ResultadoSecante calcular_secante_cpp(string expr_str, double x0, double x1, dou
     }
 }
 
-// ============================================================================
-// UNIDAD 3: SISTEMAS DE ECUACIONES LINEALES (Gauss-Jordan, Doolittle, Crout)
-// ============================================================================
+// ===============================================================================
+// UNIDAD 3: SISTEMAS DE ECUACIONES LINEALES (Gauss-Jordan, Jacobi, Gauss-Seidel)
+// ===============================================================================
 
 // ------------------------------ GAUSS-JORDAN --------------------------------
 
@@ -738,6 +742,245 @@ ResultadoGaussJordan calcular_gauss_jordan_cpp(vector<vector<double>> A, vector<
     res.exito = true;
     return res;
 }
+
+
+
+// Fila de la tabla de iteraciones (compartida por Jacobi y Gauss-Seidel)
+struct FilaIterativaSis {
+    int k;
+    vector<double> valores;
+    double error;   
+};
+
+// --------------------------------- JACOBI -----------------------------------
+
+struct ResultadoJacobi {
+    bool exito;
+    int iteraciones;
+    vector<double> x_solucion;
+    vector<FilaIterativaSis> tabla;
+    string error_msg;
+};
+
+ResultadoJacobi calcular_jacobi_cpp(
+    vector<vector<double>> A,
+    vector<double> b,
+    vector<double> x0,
+    double tolerancia,
+    int max_iter
+) {
+    ResultadoJacobi res;
+    res.exito = false;
+    res.iteraciones = 0;
+
+    // Validaciones
+    string msg = validar_sistema(A, b);
+    if (msg.empty()) msg = validar_vector(x0, A.size(), "x0");
+
+    if (!msg.empty()) {
+        res.error_msg = msg;
+        return res;
+    }
+
+    if (tolerancia <= 0) {
+        res.error_msg = "La tolerancia debe ser positiva.";
+        return res;
+    }
+
+    if (max_iter <= 0) {
+        res.error_msg = "El máximo de iteraciones debe ser positivo.";
+        return res;
+    }
+
+    int fila_cero = fila_con_diagonal_cero(A);
+    if (fila_cero != 0) {
+        res.error_msg = "Hay un cero en la diagonal principal (fila " + to_string(fila_cero) + ").";
+        return res;
+    }
+
+    int n = A.size();
+    bool dominante = es_diagonal_dominante(A);
+
+    vector<double> x = x0;
+    vector<double> anterior(n, 0.0);
+    vector<double> nuevo(n, 0.0);
+
+    for (int k = 1; k <= max_iter; k++) {
+
+        anterior = x;
+
+        // Jacobi usa SOLO valores de la iteración anterior
+        for (int i = 0; i < n; i++) {
+            double suma = 0;
+
+            for (int j = 0; j < n; j++) {
+                if (i != j) suma += A[i][j] * anterior[j];
+            }
+
+            nuevo[i] = (b[i] - suma) / A[i][i];
+        }
+
+        // Error máximo entre iteraciones
+        double error = 0;
+
+        for (int i = 0; i < n; i++) {
+            double diferencia = fabs(nuevo[i] - anterior[i]);
+            if (diferencia > error) error = diferencia;
+        }
+
+        x = nuevo;
+
+        if (!isfinite(error)) {
+            res.error_msg = "El método diverge (se obtuvieron valores no finitos).";
+            return res;
+        }
+
+        FilaIterativaSis fila;
+        fila.k = k;
+        fila.valores = x
+        fila.error = error;
+        res.tabla.push_back(fila);
+
+        res.iteraciones = k;
+
+        if (error < tolerancia) {
+            res.exito = true;
+            res.x_solucion = x;
+
+            if (!dominante) {
+                res.error_msg = "Advertencia: la matriz no es estrictamente diagonal dominante.";
+            }
+
+            return res;
+        }
+    }
+
+    // No se alcanzó la tolerancia
+    res.exito = false;
+    res.x_solucion = x;
+    res.error_msg = "No se alcanzó la tolerancia en el máximo de iteraciones.";
+
+    if (!dominante) {
+        res.error_msg += " La matriz tampoco es estrictamente diagonal dominante.";
+    }
+
+    return res;
+}
+
+// ------------------------------- GAUSS-SEIDEL --------------------------------
+
+struct ResultadoGaussSeidel {
+    bool exito;
+    int iteraciones;
+    vector<double> x_solucion;
+    vector<FilaIterativaSis> tabla;
+    string error_msg;
+};
+
+ResultadoGaussSeidel calcular_gauss_seidel_cpp(
+    vector<vector<double>> A,
+    vector<double> b,
+    vector<double> x0,
+    double tolerancia,
+    int max_iter
+) {
+    ResultadoGaussSeidel res;
+    res.exito = false;
+    res.iteraciones = 0;
+
+    // Validaciones
+    string msg = validar_sistema(A, b);
+    if (msg.empty()) msg = validar_vector(x0, A.size(), "x0");
+
+    if (!msg.empty()) {
+        res.error_msg = msg;
+        return res;
+    }
+
+    if (tolerancia <= 0) {
+        res.error_msg = "La tolerancia debe ser positiva.";
+        return res;
+    }
+
+    if (max_iter <= 0) {
+        res.error_msg = "El máximo de iteraciones debe ser positivo.";
+        return res;
+    }
+
+    int fila_cero = fila_con_diagonal_cero(A);
+    if (fila_cero != 0) {
+        res.error_msg = "Hay un cero en la diagonal principal (fila " + to_string(fila_cero) + ").";
+        return res;
+    }
+
+    int n = A.size();
+    bool dominante = es_diagonal_dominante(A);
+
+    vector<double> x = x0;
+
+    for (int k = 1; k <= max_iter; k++) {
+
+        vector<double> anterior = x;
+
+        // Gauss-Seidel usa los valores recién calculados dentro de la misma iteración
+        for (int i = 0; i < n; i++) {
+            double suma = 0;
+
+            for (int j = 0; j < n; j++) {
+                if (i != j) suma += A[i][j] * x[j];
+            }
+
+            x[i] = (b[i] - suma) / A[i][i];
+        }
+
+        // Error máximo entre iteraciones
+        double error = 0;
+
+        for (int i = 0; i < n; i++) {
+            double diferencia = fabs(x[i] - anterior[i]);
+            if (diferencia > error) error = diferencia;
+        }
+
+        if (!isfinite(error)) {
+            res.error_msg = "El método diverge (se obtuvieron valores no finitos).";
+            return res;
+        }
+
+        FilaIterativaSis fila;
+        fila.k = k;
+        fila.valores = x
+        fila.error = error;
+        res.tabla.push_back(fila);
+
+        res.iteraciones = k;
+
+        if (error < tolerancia) {
+            res.exito = true;
+            res.x_solucion = x;
+
+            if (!dominante) {
+                res.error_msg = "Advertencia: la matriz no es estrictamente diagonal dominante.";
+            }
+
+            return res;
+        }
+    }
+
+    // No se alcanzó la tolerancia
+    res.exito = false;
+    res.x_solucion = x;
+    res.error_msg = "No se alcanzó la tolerancia en el máximo de iteraciones.";
+
+    if (!dominante) {
+        res.error_msg += " La matriz tampoco es estrictamente diagonal dominante.";
+    }
+
+    return res;
+}
+
+// ============================================================================
+// UNIDAD 4: FACTORIZACIÓN LU (Doolittle, Crout)
+// ============================================================================
 
 // --------------------------- FACTORIZACIÓN LU: DOOLITTLE ---------------------
 // Diagonal de L = 1
@@ -935,242 +1178,6 @@ ResultadoCrout calcular_crout_cpp(vector<vector<double>> A, vector<double> b) {
     return res;
 }
 
-// ============================================================================
-// UNIDAD 4: MÉTODOS ITERATIVOS PARA SISTEMAS (Jacobi, Gauss-Seidel)
-// ============================================================================
-
-// Fila de la tabla de iteraciones (compartida por Jacobi y Gauss-Seidel)
-struct FilaIterativaSis {
-    int k;
-    vector<double> x;
-    double error;   // Error máximo: max |x_i(k) - x_i(k-1)|
-};
-
-// --------------------------------- JACOBI -----------------------------------
-
-struct ResultadoJacobi {
-    bool exito;
-    int iteraciones;
-    vector<double> x_solucion;
-    vector<FilaIterativaSis> tabla;
-    string error_msg;
-};
-
-ResultadoJacobi calcular_jacobi_cpp(
-    vector<vector<double>> A,
-    vector<double> b,
-    vector<double> x0,
-    double tolerancia,
-    int max_iter
-) {
-    ResultadoJacobi res;
-    res.exito = false;
-    res.iteraciones = 0;
-
-    // Validaciones
-    string msg = validar_sistema(A, b);
-    if (msg.empty()) msg = validar_vector(x0, A.size(), "x0");
-
-    if (!msg.empty()) {
-        res.error_msg = msg;
-        return res;
-    }
-
-    if (tolerancia <= 0) {
-        res.error_msg = "La tolerancia debe ser positiva.";
-        return res;
-    }
-
-    if (max_iter <= 0) {
-        res.error_msg = "El máximo de iteraciones debe ser positivo.";
-        return res;
-    }
-
-    int fila_cero = fila_con_diagonal_cero(A);
-    if (fila_cero != 0) {
-        res.error_msg = "Hay un cero en la diagonal principal (fila " + to_string(fila_cero) + ").";
-        return res;
-    }
-
-    int n = A.size();
-    bool dominante = es_diagonal_dominante(A);
-
-    vector<double> x = x0;
-    vector<double> anterior(n, 0.0);
-    vector<double> nuevo(n, 0.0);
-
-    for (int k = 1; k <= max_iter; k++) {
-
-        anterior = x;
-
-        // Jacobi usa SOLO valores de la iteración anterior
-        for (int i = 0; i < n; i++) {
-            double suma = 0;
-
-            for (int j = 0; j < n; j++) {
-                if (i != j) suma += A[i][j] * anterior[j];
-            }
-
-            nuevo[i] = (b[i] - suma) / A[i][i];
-        }
-
-        // Error máximo entre iteraciones
-        double error = 0;
-
-        for (int i = 0; i < n; i++) {
-            double diferencia = fabs(nuevo[i] - anterior[i]);
-            if (diferencia > error) error = diferencia;
-        }
-
-        x = nuevo;
-
-        if (!isfinite(error)) {
-            res.error_msg = "El método diverge (se obtuvieron valores no finitos).";
-            return res;
-        }
-
-        FilaIterativaSis fila;
-        fila.k = k;
-        fila.x = x;
-        fila.error = error;
-        res.tabla.push_back(fila);
-
-        res.iteraciones = k;
-
-        if (error < tolerancia) {
-            res.exito = true;
-            res.x_solucion = x;
-
-            if (!dominante) {
-                res.error_msg = "Advertencia: la matriz no es estrictamente diagonal dominante.";
-            }
-
-            return res;
-        }
-    }
-
-    // No se alcanzó la tolerancia
-    res.exito = false;
-    res.x_solucion = x;
-    res.error_msg = "No se alcanzó la tolerancia en el máximo de iteraciones.";
-
-    if (!dominante) {
-        res.error_msg += " La matriz tampoco es estrictamente diagonal dominante.";
-    }
-
-    return res;
-}
-
-// ------------------------------- GAUSS-SEIDEL --------------------------------
-
-struct ResultadoGaussSeidel {
-    bool exito;
-    int iteraciones;
-    vector<double> x_solucion;
-    vector<FilaIterativaSis> tabla;
-    string error_msg;
-};
-
-ResultadoGaussSeidel calcular_gauss_seidel_cpp(
-    vector<vector<double>> A,
-    vector<double> b,
-    vector<double> x0,
-    double tolerancia,
-    int max_iter
-) {
-    ResultadoGaussSeidel res;
-    res.exito = false;
-    res.iteraciones = 0;
-
-    // Validaciones
-    string msg = validar_sistema(A, b);
-    if (msg.empty()) msg = validar_vector(x0, A.size(), "x0");
-
-    if (!msg.empty()) {
-        res.error_msg = msg;
-        return res;
-    }
-
-    if (tolerancia <= 0) {
-        res.error_msg = "La tolerancia debe ser positiva.";
-        return res;
-    }
-
-    if (max_iter <= 0) {
-        res.error_msg = "El máximo de iteraciones debe ser positivo.";
-        return res;
-    }
-
-    int fila_cero = fila_con_diagonal_cero(A);
-    if (fila_cero != 0) {
-        res.error_msg = "Hay un cero en la diagonal principal (fila " + to_string(fila_cero) + ").";
-        return res;
-    }
-
-    int n = A.size();
-    bool dominante = es_diagonal_dominante(A);
-
-    vector<double> x = x0;
-
-    for (int k = 1; k <= max_iter; k++) {
-
-        vector<double> anterior = x;
-
-        // Gauss-Seidel usa los valores recién calculados dentro de la misma iteración
-        for (int i = 0; i < n; i++) {
-            double suma = 0;
-
-            for (int j = 0; j < n; j++) {
-                if (i != j) suma += A[i][j] * x[j];
-            }
-
-            x[i] = (b[i] - suma) / A[i][i];
-        }
-
-        // Error máximo entre iteraciones
-        double error = 0;
-
-        for (int i = 0; i < n; i++) {
-            double diferencia = fabs(x[i] - anterior[i]);
-            if (diferencia > error) error = diferencia;
-        }
-
-        if (!isfinite(error)) {
-            res.error_msg = "El método diverge (se obtuvieron valores no finitos).";
-            return res;
-        }
-
-        FilaIterativaSis fila;
-        fila.k = k;
-        fila.x = x;
-        fila.error = error;
-        res.tabla.push_back(fila);
-
-        res.iteraciones = k;
-
-        if (error < tolerancia) {
-            res.exito = true;
-            res.x_solucion = x;
-
-            if (!dominante) {
-                res.error_msg = "Advertencia: la matriz no es estrictamente diagonal dominante.";
-            }
-
-            return res;
-        }
-    }
-
-    // No se alcanzó la tolerancia
-    res.exito = false;
-    res.x_solucion = x;
-    res.error_msg = "No se alcanzó la tolerancia en el máximo de iteraciones.";
-
-    if (!dominante) {
-        res.error_msg += " La matriz tampoco es estrictamente diagonal dominante.";
-    }
-
-    return res;
-}
 
 // ============================================================================
 // UNIDAD 5: EIGENVALORES Y EIGENVECTORES (Potencia, Potencia Inversa)
@@ -1480,8 +1487,8 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
     value_object<FilaIteracion>("FilaIteracion")
         .field("k", &FilaIteracion::k)
         .field("xk", &FilaIteracion::xk)
-        .field("f_xk", &FilaIteracion::f_xk)
-        .field("df_xk", &FilaIteracion::df_xk)
+        .field("fx", &FilaIteracion::fx)
+        .field("dfx", &FilaIteracion::dfx)
         .field("error", &FilaIteracion::error);
 
     register_vector<FilaIteracion>("VectorFilas");
@@ -1498,8 +1505,10 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
     // Secante
     value_object<FilaIteracionSecante>("FilaIteracionSecante")
         .field("k", &FilaIteracionSecante::k)
+        .field("x_prev", &FilaIteracionSecante::x_prev)
         .field("xk", &FilaIteracionSecante::xk)
-        .field("f_xk", &FilaIteracionSecante::f_xk)
+        .field("fx_prev", &FilaIteracionSecante::fx_prev)
+        .field("fx", &FilaIteracionSecante::fx)
         .field("error", &FilaIteracionSecante::error);
 
     register_vector<FilaIteracionSecante>("VectorFilaSecante");
@@ -1530,33 +1539,10 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
 
     emscripten::function("calcular_gauss_jordan_cpp", &calcular_gauss_jordan_cpp);
 
-    // Doolittle
-    value_object<ResultadoDoolittle>("ResultadoDoolittle")
-        .field("exito", &ResultadoDoolittle::exito)
-        .field("error_msg", &ResultadoDoolittle::error_msg)
-        .field("L", &ResultadoDoolittle::L)
-        .field("U", &ResultadoDoolittle::U)
-        .field("y", &ResultadoDoolittle::y)
-        .field("x", &ResultadoDoolittle::x);
-
-    emscripten::function("calcular_doolittle_cpp", &calcular_doolittle_cpp);
-
-    // Crout
-    value_object<ResultadoCrout>("ResultadoCrout")
-        .field("exito", &ResultadoCrout::exito)
-        .field("error_msg", &ResultadoCrout::error_msg)
-        .field("L", &ResultadoCrout::L)
-        .field("U", &ResultadoCrout::U)
-        .field("y", &ResultadoCrout::y)
-        .field("x", &ResultadoCrout::x);
-
-    emscripten::function("calcular_crout_cpp", &calcular_crout_cpp);
-
-    // ---------------------------- UNIDAD 4 ----------------------------
     // Fila compartida por Jacobi y Gauss-Seidel
     value_object<FilaIterativaSis>("FilaIterativaSis")
         .field("k", &FilaIterativaSis::k)
-        .field("x", &FilaIterativaSis::x)
+        .field("valores", &FilaIterativaSis::valores)
         .field("error", &FilaIterativaSis::error);
 
     register_vector<FilaIterativaSis>("VectorFilaIterativa");
@@ -1580,6 +1566,29 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("error_msg", &ResultadoGaussSeidel::error_msg);
 
     emscripten::function("calcular_gauss_seidel_cpp", &calcular_gauss_seidel_cpp);
+
+    // ---------------------------- UNIDAD 4 ----------------------------
+    // Doolittle
+    value_object<ResultadoDoolittle>("ResultadoDoolittle")
+        .field("exito", &ResultadoDoolittle::exito)
+        .field("error_msg", &ResultadoDoolittle::error_msg)
+        .field("L", &ResultadoDoolittle::L)
+        .field("U", &ResultadoDoolittle::U)
+        .field("y", &ResultadoDoolittle::y)
+        .field("x", &ResultadoDoolittle::x);
+
+    emscripten::function("calcular_doolittle_cpp", &calcular_doolittle_cpp);
+
+    // Crout
+    value_object<ResultadoCrout>("ResultadoCrout")
+        .field("exito", &ResultadoCrout::exito)
+        .field("error_msg", &ResultadoCrout::error_msg)
+        .field("L", &ResultadoCrout::L)
+        .field("U", &ResultadoCrout::U)
+        .field("y", &ResultadoCrout::y)
+        .field("x", &ResultadoCrout::x);
+
+    emscripten::function("calcular_crout_cpp", &calcular_crout_cpp);
 
     // ---------------------------- UNIDAD 5 ----------------------------
     // Fila compartida por Potencia y Potencia Inversa
