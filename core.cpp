@@ -837,7 +837,7 @@ ResultadoJacobi calcular_jacobi_cpp(
 
         FilaIterativaSis fila;
         fila.k = k;
-        fila.valores = x
+        fila.valores = x;
         fila.error = error;
         res.tabla.push_back(fila);
 
@@ -948,7 +948,7 @@ ResultadoGaussSeidel calcular_gauss_seidel_cpp(
 
         FilaIterativaSis fila;
         fila.k = k;
-        fila.valores = x
+        fila.valores = x;
         fila.error = error;
         res.tabla.push_back(fila);
 
