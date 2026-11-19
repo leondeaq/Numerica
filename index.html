@@ -91,16 +91,26 @@
   <!-- ========================================== -->
   <!-- UNIDAD 2: RAÍCES                           -->
   <!-- ========================================== -->
-  <div id="unidad2" class="main-layout hidden">
+  <div id="unidad2" class="main-layout hidden">  
     <aside class="sidebar">
       <div class="sidebar-header"><h3>Unidad 2</h3></div>
       <ul class="method-list">
-        <li class="method-item active" id="nav-newton"><a href="#" onclick="cambiarVista('unidad2', 'biseccion', this)">Bisección</a></li>
-        <li class="method-item" id="nav-biseccion"><a href="#" onclick="cambiarVista('unidad2', 'newton', this)">Newton</a></li>
-        <li class="method-item" id="nav-secante"><a href="#" onclick="cambiarVista('unidad2', 'secante', this)">Secante</a></li>
+        <li class="method-item active"><a href="#" onclick="cambiarVista('unidad2', 'intro-u2', this)">Introducción</a></li>
+        <li class="method-item"><a href="#" onclick="cambiarVista('unidad2', 'biseccion', this)">Bisección</a></li>
+        <li class="method-item"><a href="#" onclick="cambiarVista('unidad2', 'newton', this)">Newton-Raphson</a></li>
+        <li class="method-item"><a href="#" onclick="cambiarVista('unidad2', 'secante', this)">Secante</a></li>
       </ul>
     </aside>
+    
     <main class="content-area">
+      <!-- INTRODUCCIÓN U2 -->
+      <div id="vista-intro-u2" class="vista-metodo">
+        <section class="card theory-card">
+          <h2>Búsqueda de Raíces</h2>
+          <p>En esta unidad exploraremos técnicas iterativas para encontrar los ceros de una función matemática $f(x) = 0$. Es decir, los puntos exactos donde la gráfica cruza el eje X.</p>
+          <p>Selecciona un método en el panel lateral para empezar a calcular.</p>
+        </section>
+      </div>
       
       <!-- VISTA BISECCIÓN -->
       <div id="vista-biseccion" class="vista-metodo">
