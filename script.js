@@ -281,7 +281,7 @@ function renderMatricial(res) {
   let vecSol = res.x || res.x_solucion || res.v_propio;
   if(vecSol) {
     // 1. Validar dinámicamente si estamos en Eigenvalores (Unidad 5)
-    let tituloVector = (unidadActiva === 'unidad5') ? "Vector Propio" : "Vector Solución";
+    let tituloVector = (unidadActiva === 'unidad5') ? "Vector Propio Asociado" : "Vector Solución";
     
     // 2. Imprimir el título correcto
     html += `<h4>${tituloVector}</h4><div class="matrix-bracket-small">[ `;
@@ -289,7 +289,7 @@ function renderMatricial(res) {
     html += `]</div>`;
   }
 
-  if(res.lambda_max !== undefined) html += `<h4>Eigenvalor dominante:</h4> <p>${res.lambda_max.toFixed(6)}</p>`;
+  if(res.lambda_max !== undefined) html += `<h4>Eigenvalor maximo:</h4> <p>${res.lambda_max.toFixed(6)}</p>`;
   if(res.lambda_min !== undefined) html += `<h4>Eigenvalor mínimo:</h4> <p>${res.lambda_min.toFixed(6)}</p>`;
 
   sal.innerHTML = html;
