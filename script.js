@@ -288,19 +288,53 @@ function renderMatricial(res) {
   
   let html = `<p class="success-text">Cálculo exitoso.</p>`;
   
+  // ==========================================
+  // NUEVO: MOSTRAR MATRICES L Y U (Para Unidad 4)
+  // ==========================================
+  if (res.L && res.U) {
+    html += `<div style="display: flex; gap: 40px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">`;
+    
+    // Dibujar Matriz L
+    html += `<div><h4>Matriz L</h4><div class="matrix-bracket-small" style="text-align: center; padding: 10px;">`;
+    for (let i = 0; i < res.L.size(); i++) {
+      let row = res.L.get(i);
+      html += `<div>`;
+      for (let j = 0; j < row.size(); j++) {
+        html += `<span class="vector-val" style="display:inline-block; width:65px; text-align:right; margin: 0 5px;">${row.get(j).toFixed(4)}</span>`;
+      }
+      html += `</div>`;
+    }
+    html += `</div></div>`;
+
+    // Dibujar Matriz U
+    html += `<div><h4>Matriz U</h4><div class="matrix-bracket-small" style="text-align: center; padding: 10px;">`;
+    for (let i = 0; i < res.U.size(); i++) {
+      let row = res.U.get(i);
+      html += `<div>`;
+      for (let j = 0; j < row.size(); j++) {
+        html += `<span class="vector-val" style="display:inline-block; width:65px; text-align:right; margin: 0 5px;">${row.get(j).toFixed(4)}</span>`;
+      }
+      html += `</div>`;
+    }
+    html += `</div></div>`;
+    
+    html += `</div>`; // Cierra el contenedor flexible
+  }
+
+  // ==========================================
+  // MOSTRAR VECTORES (Para el resto de métodos matriciales)
+  // ==========================================
   let vecSol = res.x || res.x_solucion || res.v_propio;
   if(vecSol) {
-    // 1. Validar dinámicamente si estamos en Eigenvalores (Unidad 5)
-    let tituloVector = (unidadActiva === 'unidad5') ? "Vector Propio Asociado" : "Vector Solución";
-    
-    // 2. Imprimir el título correcto
-    html += `<h4>${tituloVector}</h4><div class="matrix-bracket-small">[ `;
-    for(let i=0; i<vecSol.size(); i++) html += `<span class="vector-val">${vecSol.get(i).toFixed(6)}</span> `;
+    let tituloVector = (unidadActiva === 'unidad5') ? "Vector Propio" : "Vector Solución";
+    html += `<h4>${tituloVector}</h4><div class="matrix-bracket-small" style="text-align: center;">[ `;
+    for(let i=0; i<vecSol.size(); i++) html += `<span class="vector-val" style="margin: 0 5px;">${vecSol.get(i).toFixed(6)}</span> `;
     html += `]</div>`;
   }
 
-  if(res.lambda_max !== undefined) html += `<h4>Eigenvalor maximo:</h4> <p>${res.lambda_max.toFixed(6)}</p>`;
-  if(res.lambda_min !== undefined) html += `<h4>Eigenvalor mínimo:</h4> <p>${res.lambda_min.toFixed(6)}</p>`;
+  // Mostrar Eigenvalores (Unidad 5)
+  if(res.lambda_max !== undefined) html += `<h4 style="margin-top: 15px;">Eigenvalor dominante:</h4> <p>${res.lambda_max.toFixed(6)}</p>`;
+  if(res.lambda_min !== undefined) html += `<h4 style="margin-top: 15px;">Eigenvalor mínimo:</h4> <p>${res.lambda_min.toFixed(6)}</p>`;
 
   sal.innerHTML = html;
 }
