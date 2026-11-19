@@ -14,9 +14,19 @@
     };
   </script>
   <script src="core.js" defer></script>
+  <!-- 1. Configuración de MathJax para habilitar el signo de pesos -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+  </script>
+  <!-- 2. Carga del procesador MathJax -->
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script src="script.js" defer></script>
 </head>
+  
 <body>
   <header class="app-header">
     <div class="logo-container">
