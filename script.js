@@ -62,10 +62,20 @@ function cambiarVista(unidad, metodo, elementoLi) {
   document.getElementById('resMatricial')?.classList.add('hidden');
 
   // Ajustes de UI para matrices según el método
-  if (unidad !== 'unidad2') {
-    const grpTol = document.getElementById('grpTolMat');
-    if (grpTol) {
-      grpTol.style.display = ['jacobi', 'gaussseidel', 'potencia', 'potenciainversa'].includes(metodo) ? 'block' : 'none';
+  if (unidad !== 'unidad2' && unidad !== 'inicio') {
+    const formMatricial = document.querySelector('.form-card:has(#dimN)');
+    
+    // Si estamos en una pestaña de introducción, ocultamos la calculadora de matrices
+    if (metodo.startsWith('intro-')) {
+      if (formMatricial) formMatricial.style.display = 'none';
+    } else {
+      if (formMatricial) formMatricial.style.display = 'block';
+      
+      // Mostrar/ocultar tolerancia solo para métodos iterativos
+      const grpTol = document.getElementById('grpTolMat');
+      if (grpTol) {
+        grpTol.style.display = ['jacobi', 'gaussseidel', 'potencia', 'potenciainversa'].includes(metodo) ? 'block' : 'none';
+      }
     }
   }
 }
