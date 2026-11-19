@@ -15,7 +15,6 @@ function mostrarUnidad(idUnidad, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   
-  // Agregar 'inicio' a este arreglo para que se oculte correctamente cuando cambies de pestaña
   ['inicio', 'unidad2', 'unidad3', 'unidad4', 'unidad5'].forEach(u => {
     document.getElementById(u).classList.add('hidden');
   });
@@ -26,8 +25,8 @@ function mostrarUnidad(idUnidad, btn) {
   const primerEnlace = document.querySelector(`#${idUnidad} .method-list .method-item a`);
   if (primerEnlace) primerEnlace.click();
   
-  if(idUnidad !== 'unidad2') {
-    // Usamos tu selector original que ya funcionaba perfecto
+  // Mover el formulario matricial SOLO si es la unidad 3, 4 o 5
+  if(['unidad3', 'unidad4', 'unidad5'].includes(idUnidad)) {
     const formCard = document.querySelector('.form-card:has(#dimN)');
     const resCard = document.querySelector('#resMatricial');
     const contenedor = document.querySelector(`#${idUnidad} .content-area`);
@@ -38,9 +37,14 @@ function mostrarUnidad(idUnidad, btn) {
       contenedor.appendChild(resCard);
     }
     
+    // Cambiar el texto de la etiqueta del Vector dinámicamente
+    const lblVector = document.getElementById('lblVector');
+    if (lblVector) {
+      lblVector.innerText = (idUnidad === 'unidad5') ? 'Vector x0' : 'Vector b';
+    }
+    
     generarGrillas();
   }
-  
 }
 
 // Cambiar entre métodos desde el menú lateral
