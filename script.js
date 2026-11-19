@@ -338,8 +338,11 @@ function renderMatricial(res) {
   // TABLAS ITERATIVAS (Jacobi y Gauss-Seidel)
   // ==========================================
   if (res.tabla && (metodoActivo === 'jacobi' || metodoActivo === 'gaussseidel')) {
-    let nVars = res.x ? res.x.size() : parseInt(document.getElementById('dimN').value);
-    let varNames = nVars <= 3 ? ['X', 'Y', 'Z'].slice(0, nVars) : Array.from({length: nVars}, (_, k) => `X${k+1}`);
+    let nVars = parseInt(document.getElementById('dimN').value); // Tomamos la dimensión del input
+    
+    // Generar SIEMPRE X1, X2, X3... sin importar el tamaño del sistema
+    let varNames = Array.from({length: nVars}, (_, k) => `X${k+1}`);
+    
     let numIters = res.tabla.size();
     
     // Obtener la última iteración para leer los datos finales
