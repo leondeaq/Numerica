@@ -285,7 +285,7 @@ function renderMatricial(res) {
     html += `]</div>`;
   }
 
-  if(res.lambda_max !== undefined) html += `<h4>Eigenvalor dominante:</h4> <p>${res.lambda_max.toFixed(6)}</p>`;
+  if(res.lambda_max !== undefined) html += `<h4>Eigenvalor máximo:</h4> <p>${res.lambda_max.toFixed(6)}</p>`;
   if(res.lambda_min !== undefined) html += `<h4>Eigenvalor mínimo:</h4> <p>${res.lambda_min.toFixed(6)}</p>`;
 
   sal.innerHTML = html;
