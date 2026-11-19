@@ -210,13 +210,59 @@ function renderResultadosU2(res) {
   document.getElementById('valRaizU2').innerText = res.raiz.toFixed(6);
   document.getElementById('valIterU2').innerText = res.iteraciones;
   
-  let html = '';
-  for(let i=0; i<res.tabla.size(); i++) {
-    const fila = res.tabla.get(i);
-    const x_val = fila.xk !== undefined ? fila.xk : fila.xr;
-    html += `<tr><td>${fila.k}</td><td>${x_val.toFixed(6)}</td><td>${fila.error.toExponential(4)}</td></tr>`;
+  let thead = '';
+  let tbody = '';
+
+  // Configuración de columnas por método (Unidad 2)
+  if (metodoActivo === 'biseccion') {
+    thead = `<tr><th>n</th><th>a</th><th>b</th><th>c</th><th>f(a)</th><th>f(b)</th><th>f(c)</th><th>Error</th></tr>`;
+    for(let i=0; i<res.tabla.size(); i++) {
+      const fila = res.tabla.get(i);
+      tbody += `<tr>
+                  <td>${fila.k !== undefined ? fila.k : i+1}</td>
+                  <td>${fila.a !== undefined ? fila.a.toFixed(6) : '-'}</td>
+                  <td>${fila.b !== undefined ? fila.b.toFixed(6) : '-'}</td>
+                  <td>${(fila.c !== undefined ? fila.c : fila.xr).toFixed(6)}</td>
+                  <td>${fila.fa !== undefined ? fila.fa.toFixed(6) : '-'}</td>
+                  <td>${fila.fb !== undefined ? fila.fb.toFixed(6) : '-'}</td>
+                  <td>${fila.fc !== undefined ? fila.fc.toFixed(6) : '-'}</td>
+                  <td>${fila.error.toExponential(4)}</td>
+                </tr>`;
+    }
+  } 
+  else if (metodoActivo === 'newton') {
+    thead = `<tr><th>n</th><th>Xn</th><th>f(Xn)</th><th>f'(Xn)</th><th>Error</th></tr>`;
+    for(let i=0; i<res.tabla.size(); i++) {
+      const fila = res.tabla.get(i);
+      tbody += `<tr>
+                  <td>${fila.k !== undefined ? fila.k : i}</td>
+                  <td>${(fila.xk !== undefined ? fila.xk : fila.xr).toFixed(6)}</td>
+                  <td>${fila.fx !== undefined ? fila.fx.toFixed(6) : '-'}</td>
+                  <td>${fila.dfx !== undefined ? fila.dfx.toFixed(6) : '-'}</td>
+                  <td>${fila.error.toExponential(4)}</td>
+                </tr>`;
+    }
+  } 
+  else if (metodoActivo === 'secante') {
+    thead = `<tr><th>n</th><th>Xn-1</th><th>Xn</th><th>f(Xn-1)</th><th>f(Xn)</th><th>Error</th></tr>`;
+    for(let i=0; i<res.tabla.size(); i++) {
+      const fila = res.tabla.get(i);
+      tbody += `<tr>
+                  <td>${fila.k !== undefined ? fila.k : i+1}</td>
+                  <td>${fila.x_prev !== undefined ? fila.x_prev.toFixed(6) : '-'}</td>
+                  <td>${(fila.xk !== undefined ? fila.xk : fila.xr).toFixed(6)}</td>
+                  <td>${fila.fx_prev !== undefined ? fila.fx_prev.toFixed(6) : '-'}</td>
+                  <td>${fila.fx !== undefined ? fila.fx.toFixed(6) : '-'}</td>
+                  <td>${fila.error.toExponential(4)}</td>
+                </tr>`;
+    }
   }
-  document.getElementById('tablaU2').innerHTML = html;
+
+  // Insertar los encabezados y el cuerpo generados
+  const tablaContenedor = document.querySelector('#resU2 .table-container table');
+  if(tablaContenedor) {
+    tablaContenedor.innerHTML = `<thead>${thead}</thead><tbody id="tablaU2">${tbody}</tbody>`;
+  }
 }
 
 // ==========================================
@@ -287,14 +333,49 @@ function renderMatricial(res) {
   err.classList.add('hidden');
   
   let html = `<p class="success-text">Cálculo exitoso.</p>`;
+
+  // ==========================================
+  // TABLAS ITERATIVAS (Jacobi y Gauss-Seidel)
+  // ==========================================
+  if (res.iteraciones && (metodoActivo === 'jacobi' || metodoActivo === 'gaussseidel')) {
+    let nVars = res.x ? res.x.size() : parseInt(document.getElementById('dimN').value);
+    let varNames = nVars <= 3 ? ['X', 'Y', 'Z'].slice(0, nVars) : Array.from({length: nVars}, (_, k) => `X${k+1}`);
+    let numIters = res.iteraciones.size();
+
+    html += `<div class="table-container" style="margin-bottom: 20px;">
+               <table class="results-table">
+                 <thead>
+                   <tr>
+                     <th>N</th>
+                     ${varNames.map(v => `<th>${v}</th>`).join('')}
+                     <th>Error</th>
+                   </tr>
+                 </thead>
+                 <tbody>`;
+    
+    for (let i = 0; i < numIters; i++) {
+      let iterRow = res.iteraciones.get(i);
+      html += `<tr><td>${i}</td>`;
+      
+      // Imprimir las variables calculadas
+      for (let j = 0; j < nVars; j++) {
+        let val = iterRow.valores !== undefined ? iterRow.valores.get(j) : iterRow.get(j);
+        html += `<td>${val.toFixed(4)}</td>`;
+      }
+      
+      // Imprimir el error (0 en la primera iteración)
+      let errorVal = (i === 0) ? "0.0000e+0" : iterRow.error.toExponential(4);
+      html += `<td>${errorVal}</td></tr>`;
+    }
+    html += `</tbody></table></div>`;
+  }
   
   // ==========================================
-  // NUEVO: MOSTRAR MATRICES L Y U (Para Unidad 4)
+  // MOSTRAR MATRICES L Y U (Para Unidad 4)
   // ==========================================
   if (res.L && res.U) {
     html += `<div style="display: flex; gap: 40px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">`;
     
-    // Dibujar Matriz L
     html += `<div><h4>Matriz L</h4><div class="matrix-bracket-small" style="text-align: center; padding: 10px;">`;
     for (let i = 0; i < res.L.size(); i++) {
       let row = res.L.get(i);
@@ -306,7 +387,6 @@ function renderMatricial(res) {
     }
     html += `</div></div>`;
 
-    // Dibujar Matriz U
     html += `<div><h4>Matriz U</h4><div class="matrix-bracket-small" style="text-align: center; padding: 10px;">`;
     for (let i = 0; i < res.U.size(); i++) {
       let row = res.U.get(i);
@@ -318,11 +398,11 @@ function renderMatricial(res) {
     }
     html += `</div></div>`;
     
-    html += `</div>`; // Cierra el contenedor flexible
+    html += `</div>`;
   }
 
   // ==========================================
-  // MOSTRAR VECTORES (Para el resto de métodos matriciales)
+  // MOSTRAR VECTORES FINALES
   // ==========================================
   let vecSol = res.x || res.x_solucion || res.v_propio;
   if(vecSol) {
@@ -332,7 +412,6 @@ function renderMatricial(res) {
     html += `]</div>`;
   }
 
-  // Mostrar Eigenvalores (Unidad 5)
   if(res.lambda_max !== undefined) html += `<h4 style="margin-top: 15px;">Eigenvalor dominante:</h4> <p>${res.lambda_max.toFixed(6)}</p>`;
   if(res.lambda_min !== undefined) html += `<h4 style="margin-top: 15px;">Eigenvalor mínimo:</h4> <p>${res.lambda_min.toFixed(6)}</p>`;
 
