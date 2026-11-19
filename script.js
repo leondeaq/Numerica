@@ -341,33 +341,74 @@ function renderMatricial(res) {
     let nVars = res.x ? res.x.size() : parseInt(document.getElementById('dimN').value);
     let varNames = nVars <= 3 ? ['X', 'Y', 'Z'].slice(0, nVars) : Array.from({length: nVars}, (_, k) => `X${k+1}`);
     let numIters = res.tabla.size();
+    
+    // Obtener la última iteración para la tarjeta
+    let totalIters = numIters > 0 && res.tabla.get(numIters - 1).k !== undefined 
+                     ? res.tabla.get(numIters - 1).k 
+                     : numIters - 1;
 
-    html += `<div class="table-container" style="margin-bottom: 20px;">
-               <table class="results-table">
-                 <thead>
+    // 1. Tarjetas Superiores (Valores Obtenidos e Iteraciones)
+    html += `
+    <div class="results-cards-container" style="display: flex; gap: 20px; margin-bottom: 20px;">
+        <div class="result-card" style="flex: 1; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f8f9fa;">
+            <h4 style="margin: 0 0 10px 0; color: #333; font-size: 14px;">Valores Obtenidos</h4>
+            <div style="font-size: 16px; font-weight: bold; color: #0d6efd; display: flex; flex-wrap: wrap; gap: 15px;">`;
+    
+    for(let i = 0; i < nVars; i++) {
+        html += `<span>${varNames[i]} = ${res.x.get(i).toFixed(6)}</span>`;
+    }
+    
+    html += `
+            </div>
+        </div>
+        <div class="result-card" style="flex: 1; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f8f9fa;">
+            <h4 style="margin: 0 0 10px 0; color: #333; font-size: 14px;">Iteraciones</h4>
+            <div style="font-size: 18px; font-weight: bold; color: #0d6efd;">${totalIters}</div>
+        </div>
+    </div>`;
+
+    // 2. Tabla Iterativa Separada
+    html += `<div class="table-container" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: auto; margin-bottom: 20px;">
+               <table class="results-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                 <thead style="background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0;">
                    <tr>
-                     <th>N</th>
-                     ${varNames.map(v => `<th>${v}</th>`).join('')}
-                     <th>Error</th>
+                     <th style="padding: 12px;">N</th>
+                     ${varNames.map(v => `<th style="padding: 12px;">${v}</th>`).join('')}
+                     <th style="padding: 12px;">Error</th>
                    </tr>
                  </thead>
                  <tbody>`;
     
     for (let i = 0; i < numIters; i++) {
       let iterRow = res.tabla.get(i);
-      html += `<tr><td>${i}</td>`;
+      let numK = iterRow.k !== undefined ? iterRow.k : i;
+      html += `<tr style="border-bottom: 1px solid #f0f0f0;">
+                 <td style="padding: 12px;">${numK}</td>`;
       
-      // Imprimir las variables calculadas
+      // Imprimir las variables calculadas asegurando un <td> por cada una
       for (let j = 0; j < nVars; j++) {
         let val = iterRow.valores !== undefined ? iterRow.valores.get(j) : iterRow.get(j);
-        html += `<td>${val.toFixed(4)}</td>`;
+        html += `<td style="padding: 12px;">${val.toFixed(4)}</td>`;
       }
       
       // Imprimir el error (0 en la primera iteración)
       let errorVal = (i === 0) ? "0.0000e+0" : iterRow.error.toExponential(4);
-      html += `<td>${errorVal}</td></tr>`;
+      html += `<td style="padding: 12px;">${errorVal}</td></tr>`;
     }
     html += `</tbody></table></div>`;
+
+    // 3. Vector Solución al fondo
+    html += `
+    <div class="vector-bottom" style="margin-bottom: 20px;">
+        <h4 style="margin-bottom: 10px;">Vector Solución</h4>
+        <div style="font-family: monospace; font-size: 16px; background: #f8f9fa; padding: 10px; border-radius: 5px; display: inline-block;">
+            [ `;
+    for(let i = 0; i < nVars; i++) {
+        html += `<span style="margin: 0 10px;">${res.x.get(i).toFixed(6)}</span>`;
+    }
+    html += ` ]
+        </div>
+    </div>`;
   }
   
   // ==========================================
