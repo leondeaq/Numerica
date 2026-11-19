@@ -337,10 +337,10 @@ function renderMatricial(res) {
   // ==========================================
   // TABLAS ITERATIVAS (Jacobi y Gauss-Seidel)
   // ==========================================
-  if (res.iteraciones && (metodoActivo === 'jacobi' || metodoActivo === 'gaussseidel')) {
+  if (res.tabla && (metodoActivo === 'jacobi' || metodoActivo === 'gaussseidel')) {
     let nVars = res.x ? res.x.size() : parseInt(document.getElementById('dimN').value);
     let varNames = nVars <= 3 ? ['X', 'Y', 'Z'].slice(0, nVars) : Array.from({length: nVars}, (_, k) => `X${k+1}`);
-    let numIters = res.iteraciones.size();
+    let numIters = res.tabla.size();
 
     html += `<div class="table-container" style="margin-bottom: 20px;">
                <table class="results-table">
@@ -354,7 +354,7 @@ function renderMatricial(res) {
                  <tbody>`;
     
     for (let i = 0; i < numIters; i++) {
-      let iterRow = res.iteraciones.get(i);
+      let iterRow = res.tabla.get(i);
       html += `<tr><td>${i}</td>`;
       
       // Imprimir las variables calculadas
