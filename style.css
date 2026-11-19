@@ -526,6 +526,13 @@ body {
   transition: border-color 0.2s;
 }
 
+.matrix-input-container {
+    overflow-x: auto;
+    max-width: 100%;
+    padding-bottom: 10px; /* Espacio para la barra de scroll */
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+}
+
 .matrix-input:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
