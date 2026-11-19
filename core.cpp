@@ -369,8 +369,10 @@ struct FilaBiseccion {
     double a;
     double b;
     double xr;
-    double f_xr;
-    double error;   // En la iteración 1 vale 0 (aún no hay aproximación previa)
+    double fa;
+    double fb;
+    double fc;
+    double error; // En la iteración 1 vale 0 (aún no hay aproximación previa)
 };
 
 struct ResultadoBiseccion {
@@ -432,7 +434,7 @@ ResultadoBiseccion calcular_biseccion_cpp(string expr_str, double a, double b, d
             if (i > 1) error = fabs(xr - anterior);
             else error = 0;
 
-            res.tabla.push_back({i, a, b, xr, fx, error});
+            res.tabla.push_back({i, a, b, xr, fa, fb, fx, error});
 
             res.raiz = xr;
             res.iteraciones = i;
@@ -1457,7 +1459,9 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
         .field("a", &FilaBiseccion::a)
         .field("b", &FilaBiseccion::b)
         .field("xr", &FilaBiseccion::xr)
-        .field("f_xr", &FilaBiseccion::f_xr)
+        .field("fa", &FilaBiseccion::fa)
+        .field("fb", &FilaBiseccion::fb)
+        .field("fc", &FilaBiseccion::fc)
         .field("error", &FilaBiseccion::error);
 
     register_vector<FilaBiseccion>("VectorFilaBiseccion");
