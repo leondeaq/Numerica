@@ -342,10 +342,16 @@ function renderMatricial(res) {
     let varNames = nVars <= 3 ? ['X', 'Y', 'Z'].slice(0, nVars) : Array.from({length: nVars}, (_, k) => `X${k+1}`);
     let numIters = res.tabla.size();
     
-    // Obtener la última iteración para la tarjeta
-    let totalIters = numIters > 0 && res.tabla.get(numIters - 1).k !== undefined 
-                     ? res.tabla.get(numIters - 1).k 
-                     : numIters - 1;
+    // Obtener la última iteración para leer los datos finales
+    let lastRow = numIters > 0 ? res.tabla.get(numIters - 1) : null;
+    let totalIters = lastRow && lastRow.k !== undefined ? lastRow.k : Math.max(0, numIters - 1);
+
+    // Función segura para leer el valor final (intenta de res.x, si no, lo saca de la tabla)
+    const getFinalVal = (index) => {
+        if (res.x) return res.x.get(index);
+        if (lastRow) return lastRow.valores !== undefined ? lastRow.valores.get(index) : lastRow.get(index);
+        return 0;
+    };
 
     // 1. Tarjetas Superiores (Valores Obtenidos e Iteraciones)
     html += `
@@ -355,7 +361,7 @@ function renderMatricial(res) {
             <div style="font-size: 16px; font-weight: bold; color: #0d6efd; display: flex; flex-wrap: wrap; gap: 15px;">`;
     
     for(let i = 0; i < nVars; i++) {
-        html += `<span>${varNames[i]} = ${res.x.get(i).toFixed(6)}</span>`;
+        html += `<span>${varNames[i]} = ${getFinalVal(i).toFixed(6)}</span>`;
     }
     
     html += `
@@ -385,13 +391,11 @@ function renderMatricial(res) {
       html += `<tr style="border-bottom: 1px solid #f0f0f0;">
                  <td style="padding: 12px;">${numK}</td>`;
       
-      // Imprimir las variables calculadas asegurando un <td> por cada una
       for (let j = 0; j < nVars; j++) {
         let val = iterRow.valores !== undefined ? iterRow.valores.get(j) : iterRow.get(j);
         html += `<td style="padding: 12px;">${val.toFixed(4)}</td>`;
       }
       
-      // Imprimir el error (0 en la primera iteración)
       let errorVal = (i === 0) ? "0.0000e+0" : iterRow.error.toExponential(4);
       html += `<td style="padding: 12px;">${errorVal}</td></tr>`;
     }
@@ -404,7 +408,7 @@ function renderMatricial(res) {
         <div style="font-family: monospace; font-size: 16px; background: #f8f9fa; padding: 10px; border-radius: 5px; display: inline-block;">
             [ `;
     for(let i = 0; i < nVars; i++) {
-        html += `<span style="margin: 0 10px;">${res.x.get(i).toFixed(6)}</span>`;
+        html += `<span style="margin: 0 10px;">${getFinalVal(i).toFixed(6)}</span>`;
     }
     html += ` ]
         </div>
