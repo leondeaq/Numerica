@@ -273,33 +273,40 @@
   <!-- ====================================================== -->
   <div id="unidad3" class="main-layout hidden">
     <aside class="sidebar">
-      <div class="sidebar-header"><h3>Unidad 3</h3></div>
+      <div class="sidebar-header"><h3>Sistemas Lineales (U3)</h3></div>
       <ul class="method-list">
-        <li class="method-item active"><a href="#" onclick="cambiarVista('unidad3', 'gaussjordan', this)">Gauss-Jordan</a></li>
+        <li class="method-item active"><a href="#" onclick="cambiarVista('unidad3', 'intro-u3', this)">Introducción</a></li>
+        <li class="method-item"><a href="#" onclick="cambiarVista('unidad3', 'gaussjordan', this)">Gauss-Jordan</a></li>
         <li class="method-item"><a href="#" onclick="cambiarVista('unidad3', 'jacobi', this)">Jacobi</a></li>
         <li class="method-item"><a href="#" onclick="cambiarVista('unidad3', 'gaussseidel', this)">Gauss-Seidel</a></li>
       </ul>
     </aside>
     <main class="content-area">
-      <!-- VISTA GAUSS-JORDAN -->
-      <div id="vista-gaussjordan" class="vista-metodo">
+      <!-- NUEVA VISTA INTRODUCCIÓN U3 -->
+      <div id="vista-intro-u3" class="vista-metodo">
+        <section class="card theory-card">
+          <h2>Sistemas de Ecuaciones Lineales</h2>
+          <p>Aquí resolveremos problemas estructurales del tipo <strong>Ax = b</strong>. Estas herramientas te permitirán encontrar el valor de múltiples incógnitas simultáneamente.</p>
+        </section>
+      </div>
+
+      <!-- VISTAS DE MÉTODOS U3 (Actualiza textos) -->
+      <div id="vista-gaussjordan" class="vista-metodo hidden">
         <section class="card theory-card">
           <h2>Gauss-Jordan</h2>
-          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Gauss-Jordan.</p>
+          <p>Un método directo. Transforma la matriz original en una matriz identidad para revelar la solución exacta del sistema de una sola vez.</p>
         </section>
       </div>
-      <!-- VISTA JACOBI -->
-        <div id="vista-jacobi" class="vista-metodo hidden">
+      <div id="vista-jacobi" class="vista-metodo hidden">
         <section class="card theory-card">
           <h2>Jacobi</h2>
-          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Jacobi.</p>
+          <p>Un enfoque iterativo. Adivina una solución inicial y la pule ciclo tras ciclo usando las ecuaciones despejadas.</p>
         </section>
       </div>
-      <!-- VISTA GAUSS-SEIDEL -->
       <div id="vista-gaussseidel" class="vista-metodo hidden">
         <section class="card theory-card">
           <h2>Gauss-Seidel</h2>
-          <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Gauss-Seidel</p>
+          <p>La versión optimizada de Jacobi. Utiliza los valores recién calculados de inmediato, lo que acelera drásticamente la llegada a la respuesta final.</p>
         </section>
       </div>
 
@@ -345,6 +352,13 @@
       </ul>
     </aside>
     <main class="content-area">
+      <!-- INTRODUCCIÓN U4 -->
+      <div id="vista-intro-u4" class="vista-metodo">
+        <section class="card theory-card">
+          <h2>Factorización LU</h2>
+          <p>Descomponer una matriz compleja en dos matrices triangulares (L y U) facilita enormemente la resolución de sistemas cuando solo cambia el vector de resultados.</p>
+        </section>
+      </div>
       <!-- VISTA DOOLITTLE -->
         <div id="vista-doolittle" class="vista-metodo">
         <section class="card theory-card">
@@ -375,6 +389,13 @@
       </ul>
     </aside>
     <main class="content-area">
+      <!-- INTRODUCCIÓN U5 -->
+      <div id="vista-intro-u5" class="vista-metodo">
+        <section class="card theory-card">
+          <h2>Valores y Vectores Propios</h2>
+          <p>Descubre las propiedades fundamentales de una matriz, esenciales para entender la estabilidad de sistemas, vibraciones mecánicas y algoritmos de búsqueda.</p>
+        </section>
+      </div>
       <div id="vista-potencia" class="vista-metodo">
         <section class="card theory-card">
           <h2>Método de la Potencia</h2>
