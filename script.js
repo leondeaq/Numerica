@@ -494,7 +494,7 @@ function renderMatricial(res) {
   // MOSTRAR VECTORES FINALES
   // ==========================================
   let vecSol = res.x || res.x_solucion || res.v_propio;
-  if(vecSol) {
+  if(vecSol && !['jacobi', 'gaussseidel'].includes(metodoActivo)) {
     let tituloVector = (unidadActiva === 'unidad5') ? "Vector Propio" : "Vector Solución";
     html += `<h4>${tituloVector}</h4><div class="matrix-bracket-small" style="text-align: center;">[ `;
     for(let i=0; i<vecSol.size(); i++) html += `<span class="vector-val" style="margin: 0 5px;">${vecSol.get(i).toFixed(6)}</span> `;
