@@ -255,7 +255,7 @@ function renderResultadosU2(res) {
                   <td>${fila.k !== undefined ? fila.k : i+1}</td>
                   <td>${fila.a !== undefined ? fila.a.toFixed(6) : '-'}</td>
                   <td>${fila.b !== undefined ? fila.b.toFixed(6) : '-'}</td>
-                  <td>${(fila.c !== undefined ? fila.c : fila.xr).toFixed(6)}</td>
+                  <td style="font-weight: bold; color: #0d6efd; background-color: rgba(13, 110, 253, 0.05);">${(fila.c !== undefined ? fila.c : fila.xr).toFixed(6)}</td>
                   <td>${fila.fa !== undefined ? fila.fa.toFixed(6) : '-'}</td>
                   <td>${fila.fb !== undefined ? fila.fb.toFixed(6) : '-'}</td>
                   <td>${fila.fc !== undefined ? fila.fc.toFixed(6) : '-'}</td>
@@ -269,7 +269,7 @@ function renderResultadosU2(res) {
       const fila = res.tabla.get(i);
       tbody += `<tr>
                   <td>${fila.k !== undefined ? fila.k : i}</td>
-                  <td>${(fila.xk !== undefined ? fila.xk : fila.xr).toFixed(6)}</td>
+                  <td style="font-weight: bold; color: #0d6efd; background-color: rgba(13, 110, 253, 0.05);">${(fila.xk !== undefined ? fila.xk : fila.xr).toFixed(6)}</td>
                   <td>${fila.fx !== undefined ? fila.fx.toFixed(6) : '-'}</td>
                   <td>${fila.dfx !== undefined ? fila.dfx.toFixed(6) : '-'}</td>
                   <td>${fila.error.toExponential(4)}</td>
@@ -283,7 +283,7 @@ function renderResultadosU2(res) {
       tbody += `<tr>
                   <td>${fila.k !== undefined ? fila.k : i+1}</td>
                   <td>${fila.x_prev !== undefined ? fila.x_prev.toFixed(6) : '-'}</td>
-                  <td>${(fila.xk !== undefined ? fila.xk : fila.xr).toFixed(6)}</td>
+                  <td style="font-weight: bold; color: #0d6efd; background-color: rgba(13, 110, 253, 0.05);">${(fila.xk !== undefined ? fila.xk : fila.xr).toFixed(6)}</td>
                   <td>${fila.fx_prev !== undefined ? fila.fx_prev.toFixed(6) : '-'}</td>
                   <td>${fila.fx !== undefined ? fila.fx.toFixed(6) : '-'}</td>
                   <td>${fila.error.toExponential(4)}</td>
