@@ -101,16 +101,36 @@ function generarGrillas() {
 
   const gridA = document.getElementById('gridA');
   const gridB = document.getElementById('gridB');
+  // 1. Obtenemos el nuevo contenedor del Vector Inicial (X0)
+  const gridX0 = document.getElementById('gridX0'); 
   
   gridA.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
   gridA.innerHTML = '';
   gridB.innerHTML = '';
+  if (gridX0) gridX0.innerHTML = ''; // Limpiamos también el de X0
 
   for(let i=0; i<n; i++) {
+    // Generar casillas de la Matriz A
     for(let j=0; j<n; j++) {
       gridA.innerHTML += `<input type="number" step="any" class="matrix-input" id="A_${i}_${j}" value="${i===j?2:1}">`;
     }
+    // Generar casillas del Vector b
     gridB.innerHTML += `<input type="number" step="any" class="matrix-input vector-input" id="B_${i}" value="1">`;
+    
+    // 2. Generar casillas del Vector Inicial (X0) prellenadas con 0
+    if (gridX0) {
+      gridX0.innerHTML += `<input type="number" step="any" class="matrix-input vector-input" id="vecX0_${i}" value="0">`;
+    }
+  }
+
+  // 3. Mostrar u ocultar la columna completa del Vector X0 según el método seleccionado
+  let secX0 = document.getElementById('secVectorX0');
+  if (secX0) {
+      if (['jacobi', 'gaussseidel', 'potencia', 'potenciainversa'].includes(metodoActivo)) {
+          secX0.style.display = 'block'; // Mostrar si es iterativo
+      } else {
+          secX0.style.display = 'none';  // Ocultar si es directo (Gauss-Jordan, LU)
+      }
   }
 }
 
