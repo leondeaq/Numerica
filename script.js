@@ -76,6 +76,9 @@ function cambiarVista(unidad, metodo, elementoLi) {
       if (grpTol) {
         grpTol.style.display = ['jacobi', 'gaussseidel', 'potencia', 'potenciainversa'].includes(metodo) ? 'block' : 'none';
       }
+      
+      // Refrescar las grillas para mostrar/ocultar el vector inicial al instante
+      generarGrillas();
     }
   }
 }
@@ -126,10 +129,11 @@ function generarGrillas() {
   // 3. Mostrar u ocultar la columna completa del Vector X0 según el método seleccionado
   let secX0 = document.getElementById('secVectorX0');
   if (secX0) {
-      if (['jacobi', 'gaussseidel', 'potencia', 'potenciainversa'].includes(metodoActivo)) {
-          secX0.style.display = 'block'; // Mostrar si es iterativo
+      // SOLO mostrar en Jacobi y Gauss-Seidel
+      if (['jacobi', 'gaussseidel'].includes(metodoActivo)) {
+          secX0.style.display = 'block'; 
       } else {
-          secX0.style.display = 'none';  // Ocultar si es directo (Gauss-Jordan, LU)
+          secX0.style.display = 'none';  
       }
   }
 }
@@ -152,6 +156,15 @@ function leerVector(n) {
     vec.push_back(parseFloat(document.getElementById(`B_${i}`).value) || 0);
   }
   return vec;
+}
+
+function leerVectorInicial(n) {
+  let vecX0 = new Module.VectorDouble(); 
+  for (let i = 0; i < n; i++) {
+      let val = parseFloat(document.getElementById(`vecX0_${i}`).value) || 0;
+      vecX0.push_back(val);
+  }
+  return vecX0;
 }
 
 // ==========================================
@@ -297,12 +310,12 @@ function ejecutarMatricial() {
   // Validar antes de mandar a C++
   if (isNaN(n) || n < 2 || n > 10) {
       alert("Error: La dimensión de la matriz debe estar entre 2 y 10.");
-      return; // Detiene la ejecución
+      return; 
   }
   
   const tol = parseFloat(document.getElementById('tolMat').value);
 
-  // Validar la tolerancia (Aplica para Jacobi, Gauss-Seidel y Potencia)
+  // Validar la tolerancia
   if (isNaN(tol) || tol < 0.00000001 || tol > 0.1) {
       alert("Error: La tolerancia debe ser un valor positivo entre 0.00000001 y 0.1");
       return;
@@ -313,13 +326,20 @@ function ejecutarMatricial() {
   const A = leerMatriz(n);
   const b = leerVector(n);
   
+  // Leer el vector inicial SOLO para Jacobi y Gauss-Seidel
+  let x0 = null;
+  if (['jacobi', 'gaussseidel'].includes(metodoActivo)) {
+      x0 = leerVectorInicial(n);
+  }
+  
   let res;
   try {
     if (metodoActivo === 'gaussjordan') res = Module.calcular_gauss_jordan_cpp(A, b);
     else if (metodoActivo === 'doolittle') res = Module.calcular_doolittle_cpp(A, b);
     else if (metodoActivo === 'crout') res = Module.calcular_crout_cpp(A, b);
-    else if (metodoActivo === 'jacobi') res = Module.calcular_jacobi_cpp(A, b, b, tol, maxI);
-    else if (metodoActivo === 'gaussseidel') res = Module.calcular_gauss_seidel_cpp(A, b, b, tol, maxI);
+    // Mandamos x0 en lugar del segundo 'b'
+    else if (metodoActivo === 'jacobi') res = Module.calcular_jacobi_cpp(A, b, x0, tol, maxI);
+    else if (metodoActivo === 'gaussseidel') res = Module.calcular_gauss_seidel_cpp(A, b, x0, tol, maxI);
     else if (metodoActivo === 'potencia') res = Module.calcular_potencia_cpp(A, b, tol, maxI);
     else if (metodoActivo === 'potenciainversa') res = Module.calcular_potencia_inversa_cpp(A, b, tol, maxI);
     
@@ -327,6 +347,7 @@ function ejecutarMatricial() {
   } finally {
     A.delete();
     b.delete();
+    if (x0) x0.delete(); // Limpiar x0 de la memoria si fue creado
     if (res && res.x) res.x.delete();
     if (res && res.pasos) res.pasos.delete();
     if (res && res.tabla) res.tabla.delete();
