@@ -379,25 +379,19 @@ function renderMatricial(res) {
   // TABLAS ITERATIVAS (Jacobi y Gauss-Seidel)
   // ==========================================
   if (res.tabla && (metodoActivo === 'jacobi' || metodoActivo === 'gaussseidel')) {
-    let nVars = parseInt(document.getElementById('dimN').value); // Tomamos la dimensión del input
-    
-    // Generar SIEMPRE X1, X2, X3... sin importar el tamaño del sistema
+    let nVars = parseInt(document.getElementById('dimN').value);
     let varNames = Array.from({length: nVars}, (_, k) => `X${k+1}`);
-    
     let numIters = res.tabla.size();
-    
-    // Obtener la última iteración para leer los datos finales
     let lastRow = numIters > 0 ? res.tabla.get(numIters - 1) : null;
     let totalIters = lastRow && lastRow.k !== undefined ? lastRow.k : Math.max(0, numIters - 1);
 
-    // Función segura para leer el valor final (intenta de res.x, si no, lo saca de la tabla)
     const getFinalVal = (index) => {
         if (res.x) return res.x.get(index);
         if (lastRow) return lastRow.valores !== undefined ? lastRow.valores.get(index) : lastRow.get(index);
         return 0;
     };
 
-    // 1. Tarjetas Superiores (Valores Obtenidos e Iteraciones)
+    // 1. Tarjetas Superiores
     html += `
     <div class="results-cards-container" style="display: flex; gap: 20px; margin-bottom: 20px;">
         <div class="result-card" style="flex: 1; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f8f9fa;">
@@ -417,7 +411,7 @@ function renderMatricial(res) {
         </div>
     </div>`;
 
-    // 2. Tabla Iterativa Separada
+    // 2. Tabla Iterativa
     html += `<div class="table-container" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: auto; margin-bottom: 20px;">
                <table class="results-table" style="width: 100%; border-collapse: collapse; text-align: left;">
                  <thead style="background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0;">
@@ -458,6 +452,45 @@ function renderMatricial(res) {
         </div>
     </div>`;
   }
+
+  // ==========================================
+  // MOSTRAR PASOS DE GAUSS-JORDAN
+  // ==========================================
+  if (metodoActivo === 'gaussjordan' && res.pasos && res.pasos.size() > 0) {
+    html += `<div style="margin-bottom: 20px;">
+               <h4>Procedimiento Paso a Paso (Gauss-Jordan)</h4>`;
+
+    for (let k = 0; k < res.pasos.size(); k++) {
+      let item = res.pasos.get(k);
+      let mat = item.matriz_estado;
+
+      html += `
+        <div style="background: #f8f9fa; border-left: 3px solid #0d6efd; padding: 10px 14px; margin-bottom: 12px; border-radius: 4px;">
+          <p style="margin: 0 0 8px 0; font-family: monospace; font-size: 0.95em;">
+            <strong>Paso ${item.paso}:</strong> ${item.descripcion}
+          </p>
+          <div class="table-container" style="overflow-x: auto;">
+            <table class="results-table" style="width: auto; margin: 0 auto; border-collapse: collapse; text-align: center; background: #fff; border: 1px solid #e0e0e0;">
+              <tbody>`;
+
+      for (let i = 0; i < mat.size(); i++) {
+        let fila = mat.get(i);
+        html += `<tr style="border-bottom: 1px solid #f0f0f0;">`;
+        for (let j = 0; j < fila.size(); j++) {
+          let esColB = (j === fila.size() - 1);
+          let estilo = esColB 
+            ? 'border-left: 2px solid #333; font-weight: bold; background-color: rgba(13, 110, 253, 0.05);' 
+            : '';
+          html += `<td style="padding: 6px 12px; ${estilo}">${fila.get(j).toFixed(4)}</td>`;
+        }
+        html += `</tr>`;
+      }
+
+      html += `</tbody></table></div></div>`;
+    }
+
+    html += `</div>`;
+  }
   
   // ==========================================
   // MOSTRAR MATRICES L Y U (Para Unidad 4)
@@ -489,6 +522,23 @@ function renderMatricial(res) {
     
     html += `</div>`;
   }
+
+  // ==========================================
+  // MOSTRAR VECTORES FINALES
+  // ==========================================
+  let vecSol = res.x || res.x_solucion || res.v_propio;
+  if(vecSol && !['jacobi', 'gaussseidel'].includes(metodoActivo)) {
+    let tituloVector = (unidadActiva === 'unidad5') ? "Vector Propio" : "Vector Solución";
+    html += `<h4>${tituloVector}</h4><div class="matrix-bracket-small" style="text-align: center;">[ `;
+    for(let i=0; i<vecSol.size(); i++) html += `<span class="vector-val" style="margin: 0 5px;">${vecSol.get(i).toFixed(6)}</span> `;
+    html += `]</div>`;
+  }
+
+  if(res.lambda_max !== undefined) html += `<h4 style="margin-top: 15px;">Eigenvalor dominante:</h4> <p>${res.lambda_max.toFixed(6)}</p>`;
+  if(res.lambda_min !== undefined) html += `<h4 style="margin-top: 15px;">Eigenvalor mínimo:</h4> <p>${res.lambda_min.toFixed(6)}</p>`;
+
+  sal.innerHTML = html;
+}
 
   // ==========================================
   // MOSTRAR VECTORES FINALES
