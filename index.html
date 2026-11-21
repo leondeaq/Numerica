@@ -168,6 +168,12 @@
               <div class="form-group col-4"><label>Máx. Iter:</label>
                 <input type="number" id="iter_bis" min="1" max="1000" step="1" placeholder="100" required></div>
             </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+              <button type="button" class="btn btn-secondary" onclick="cargarEjemploU2('biseccion', 'valido')">Cargar Ejemplo</button>
+              <button type="button" class="btn btn-secondary" onclick="cargarEjemploU2('biseccion', 'falla')">Cargar Contraejemplo</button>
+            </div>
+            
             <button type="submit" class="btn btn-primary btn-block">Calcular Raíz</button>
           </form>
         </section>
