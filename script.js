@@ -540,23 +540,6 @@ function renderMatricial(res) {
   sal.innerHTML = html;
 }
 
-  // ==========================================
-  // MOSTRAR VECTORES FINALES
-  // ==========================================
-  let vecSol = res.x || res.x_solucion || res.v_propio;
-  if(vecSol && !['jacobi', 'gaussseidel'].includes(metodoActivo)) {
-    let tituloVector = (unidadActiva === 'unidad5') ? "Vector Propio" : "Vector Solución";
-    html += `<h4>${tituloVector}</h4><div class="matrix-bracket-small" style="text-align: center;">[ `;
-    for(let i=0; i<vecSol.size(); i++) html += `<span class="vector-val" style="margin: 0 5px;">${vecSol.get(i).toFixed(6)}</span> `;
-    html += `]</div>`;
-  }
-
-  if(res.lambda_max !== undefined) html += `<h4 style="margin-top: 15px;">Eigenvalor dominante:</h4> <p>${res.lambda_max.toFixed(6)}</p>`;
-  if(res.lambda_min !== undefined) html += `<h4 style="margin-top: 15px;">Eigenvalor mínimo:</h4> <p>${res.lambda_min.toFixed(6)}</p>`;
-
-  sal.innerHTML = html;
-}
-
 // ==========================================
 // 5. TECLADO MATEMÁTICO (U2)
 // ==========================================
