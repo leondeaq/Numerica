@@ -548,3 +548,49 @@ function sonEntradasValidas(tolerancia, iteraciones) {
     
     return true;
 }
+
+// ==========================================
+// 6. EJEMPLOS Y CONTRAEJEMPLOS (UNIDAD 2)
+// ==========================================
+function cargarEjemploU2(metodo, tipo) {
+  if (metodo === 'biseccion') {
+    if (tipo === 'valido') {
+      document.getElementById('fn_biseccion').value = 'x^3 - 2*x - 5';
+      document.getElementById('a_bis').value = 2;
+      document.getElementById('b_bis').value = 3;
+    } else {
+      // Contraejemplo: Raíz tangente (no hay cambio de signo en el intervalo)
+      document.getElementById('fn_biseccion').value = 'x^2 - 4*x + 4';
+      document.getElementById('a_bis').value = 0;
+      document.getElementById('b_bis').value = 3;
+    }
+    document.getElementById('tol_bis').value = 0.0001;
+    document.getElementById('iter_bis').value = 100;
+  } 
+  else if (metodo === 'newton') {
+    if (tipo === 'valido') {
+      document.getElementById('fn_newton').value = 'x^3 - 2*x - 5';
+      document.getElementById('x0_newton').value = 2;
+    } else {
+      // Contraejemplo: Pendiente cero en x0 = 0 (división entre cero en f'(x0))
+      document.getElementById('fn_newton').value = 'x^2 - 4';
+      document.getElementById('x0_newton').value = 0;
+    }
+    document.getElementById('tol_newton').value = 0.0001;
+    document.getElementById('iter_newton').value = 100;
+  } 
+  else if (metodo === 'secante') {
+    if (tipo === 'valido') {
+      document.getElementById('fn_secante').value = 'x^3 - 2*x - 5';
+      document.getElementById('x0_sec').value = 2;
+      document.getElementById('x1_sec').value = 3;
+    } else {
+      // Contraejemplo: f(x0) = f(x1), genera recta secante horizontal (división entre cero)
+      document.getElementById('fn_secante').value = 'x^2 - 4';
+      document.getElementById('x0_sec').value = -1;
+      document.getElementById('x1_sec').value = 1;
+    }
+    document.getElementById('tol_sec').value = 0.0001;
+    document.getElementById('iter_sec').value = 100;
+  }
+}
