@@ -127,9 +127,6 @@
           <h2>Búsqueda de Raíces</h2>
           <p>En esta unidad exploraremos técnicas iterativas para encontrar los ceros de una función matemática $f(x) = 0$. Es decir, los puntos exactos donde la gráfica cruza el eje X.</p>
           <p>Selecciona un método en el panel lateral para empezar a calcular.</p>
-          <div class="formula-box">
-            $$c = \frac{a + b}{2} \quad \text{con } f(a) \cdot f(b) < 0$$
-          </div>
         </section>
       </div>
       
@@ -139,6 +136,9 @@
           <h2>Método de Bisección</h2>
           <p>Se programa una de las ecuaciones no lineales visto en clase. Se ingresa un valor inicial para poder calcular la solución de una ecuación no lineal y el programa presenta la solución, 
             genera tabla de datos para revisar la solución.</p>
+          <div class="formula-box">
+            $$c = \frac{a + b}{2} \quad \text{con } f(a) \cdot f(b) < 0$$
+          </div>
         </section>
         <section class="card form-card">
           <form onsubmit="event.preventDefault(); ejecutarU2('biseccion');">
@@ -188,6 +188,9 @@
           <h2>Método de Newton-Raphson</h2>
           <p>Se programa una de las ecuaciones no lineales visto en clase. Se ingresa un valor inicial para poder calcular la solución de la ecuación no lineal 
             y el programa presenta la solución, se genera tabla de datos para revisar solución.</p>
+          <div class="formula-box">
+            $$x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)}$$
+          </div>
         </section>
         <section class="card form-card">
           <form onsubmit="event.preventDefault(); ejecutarU2('newton');">
@@ -236,6 +239,9 @@
           <h2>Método de la Secante</h2>
           <p>Se programa una de las ecuaciones no lineales visto en clase. Se ingresan dos valores iniciales para poder calcular la solución de una ecuación no lineal 
             y el programa presenta la solución, se genera tabla de datos para revisar solución.</p>
+          <div class="formula-box">
+            $$x_{k+1} = x_k - \frac{f(x_k)(x_k - x_{k-1})}{f(x_k) - f(x_{k-1})}$$
+          </div>
         </section>
         <section class="card form-card">
           <form onsubmit="event.preventDefault(); ejecutarU2('secante');">
