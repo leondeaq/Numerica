@@ -555,3 +555,148 @@ body {
     border-bottom: 1px solid var(--border-color);
   }
 }
+
+/* === BANNER HERO DE BIENVENIDA === */
+.hero-card {
+  background: linear-gradient(135deg, #1a2b4c 0%, #243b67 100%);
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 36px 40px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 25px rgba(26, 43, 76, 0.18);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(56, 189, 248, 0.18);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.hero-card h2 {
+  font-size: 2rem;
+  margin: 0 0 12px 0;
+  color: #ffffff;
+}
+
+.highlight-text {
+  color: #38bdf8;
+}
+
+.hero-card p {
+  color: #cbd5e1;
+  font-size: 1.05rem;
+  max-width: 680px;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 18px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-item strong {
+  font-size: 1.4rem;
+  color: #ffffff;
+}
+
+.stat-item span {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* === CUADRÍCULA DE UNIDADES === */
+.section-subtitle {
+  font-size: 1.15rem;
+  color: #1e293b;
+  margin: 0 0 16px 4px;
+  font-weight: 700;
+}
+
+.units-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.unit-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+.unit-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  border-color: #3b82f6;
+}
+
+.unit-icon {
+  width: 44px;
+  height: 44px;
+  background: #eff6ff;
+  color: #2563eb;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin-bottom: 14px;
+  font-family: 'Georgia', serif;
+}
+
+.unit-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 4px;
+}
+
+.unit-card h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+.unit-card p {
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0 0 18px 0;
+  flex-grow: 1;
+}
+
+.unit-link {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #2563eb;
+}
+
