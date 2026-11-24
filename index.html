@@ -330,18 +330,27 @@
         <section class="card theory-card">
           <h2>Gauss-Jordan</h2>
           <p>Un método directo. Transforma la matriz original en una matriz identidad para revelar la solución exacta del sistema de una sola vez.</p>
+          <div class="formula-box">
+            $$[A \mid b] \xrightarrow{\text{operaciones elementales}} [I \mid x]$$
+          </div>
         </section>
       </div>
       <div id="vista-jacobi" class="vista-metodo hidden">
         <section class="card theory-card">
           <h2>Jacobi</h2>
           <p>Un enfoque iterativo. Adivina una solución inicial y la pule ciclo tras ciclo usando las ecuaciones despejadas.</p>
+          <div class="formula-box">
+            $$x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{\substack{j=1 \\ j \neq i}}^{n} a_{ij} x_j^{(k)} \right)$$
+          </div>
         </section>
       </div>
       <div id="vista-gaussseidel" class="vista-metodo hidden">
         <section class="card theory-card">
           <h2>Gauss-Seidel</h2>
           <p>La versión optimizada de Jacobi. Utiliza los valores recién calculados de inmediato, lo que acelera drásticamente la llegada a la respuesta final.</p>
+          <div class="formula-box">
+            $$x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j=1}^{i-1} a_{ij} x_j^{(k+1)} - \sum_{j=i+1}^{n} a_{ij} x_j^{(k)} \right)$$
+          </div>
         </section>
       </div>
 
@@ -407,6 +416,9 @@
         <section class="card theory-card">
           <h2>Factorización LU (Doolittle)</h2>
           <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Doolittle.</p>
+          <div class="formula-box">
+            $$A = L \cdot U \quad \text{con } l_{ii} = 1 \quad \Rightarrow \quad Ly = b, \; Ux = y$$
+          </div>
         </section>
       </div>
       <!-- VISTA CROUT -->
@@ -414,6 +426,9 @@
         <section class="card theory-card">
           <h2>Factorización LU (Crout)</h2>
           <p>El programa recibe un sistema de ecuaciones lineales, y el programa presenta la solución del sistema lineal de ecuaciones obtenida mediante el método de Crout.</p>
+          <div class="formula-box">
+            $$A = L \cdot U \quad \text{con } u_{ii} = 1 \quad \Rightarrow \quad Ly = b, \; Ux = y$$
+          </div>
         </section>
       </div>
       <!-- Reutiliza el formulario y resultados matriciales de JS -->
@@ -444,12 +459,18 @@
         <section class="card theory-card">
           <h2>Método de la Potencia</h2>
           <p>El programa recibe una matriz cuadrada y el programa presenta el valor propio máximo y su vector propio correspondiente.</p>
+          <div class="formula-box">
+            $$x^{(k+1)} = \frac{A x^{(k)}}{\|A x^{(k)}\|_\infty}, \quad \lambda_{\max} \approx \frac{(x^{(k)})^T A x^{(k)}}{(x^{(k)})^T x^{(k)}}$$
+          </div>
         </section>
       </div>
       <div id="vista-potenciainversa" class="vista-metodo hidden">
         <section class="card theory-card">
           <h2>Potencia Inversa</h2>
           <p>El programa recibe una matriz cuadrada y el programa presenta el valor propio mínimo y su vector propio correspondiente.</p>
+          <div class="formula-box">
+            $$x^{(k+1)} = \frac{A^{-1} x^{(k)}}{\|A^{-1} x^{(k)}\|_\infty}, \quad \lambda_{\min} = \frac{1}{\mu_{\max}}$$
+          </div>
         </section>
       </div>
     </main>
