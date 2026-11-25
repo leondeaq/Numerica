@@ -63,7 +63,7 @@
         <!-- Banner Principal (Hero) -->
         <section class="hero-card">
           <div class="hero-badge">Motor C++ & WebAssembly</div>
-          <h2>Bienvenido a <span class="highlight-text">NUMÉRICA</span></h2>
+          <h2>Bienvenido a <span class="highlight-text">NUMERICA</span></h2>
           <p>Plataforma de cálculo científico para la resolución paso a paso de métodos numéricos con precisión y velocidad nativa en el navegador.</p>
           <div class="hero-stats">
             <div class="stat-item"><strong>4</strong><span>Unidades</span></div>
@@ -110,45 +110,133 @@
       
         </div>
       </div>
+      
       <!-- VISTA GUÍA DE USO -->
       <div id="vista-guia" class="vista-metodo hidden">
         <section class="card theory-card">
           <h2>Guía de Sintaxis Matemática</h2>
-          <p>Para evitar errores en la Unidad 2, ingresa las funciones siguiendo estas reglas:</p>
-          <ul>
-            <li><strong>Potencias:</strong> Usa el símbolo `^` (Ej. <code>x^3</code>, <code>x^2</code>)</li>
-            <li><strong>Multiplicación explícita:</strong> Siempre usa `*` (Ej. <code>2*x</code> en lugar de <code>2x</code>)</li>
-            <li><strong>Raíces cuadradas:</strong> <code>sqrt(x)</code></li>
-            <li><strong>Funciones trigonométricas:</strong> <code>sin(x)</code>, <code>cos(x)</code>, <code>tan(x)</code></li>
-            <li><strong>Exponenciales:</strong> <code>exp(x)</code> para eˣ</li>
-          </ul>
+          <p>Para que el motor en C++ evalúe correctamente tus funciones en la <strong>Unidad 2</strong>, respeta las siguientes reglas de escritura:</p>
         </section>
+      
+        <div class="syntax-grid">
+          <div class="syntax-card">
+            <div class="syntax-badge">^</div>
+            <h4>Potencias</h4>
+            <p>Usa el acento circunflejo para elevar términos a cualquier exponente.</p>
+            <div class="syntax-example"><code>x^3 - 2*x^2</code></div>
+          </div>
+      
+          <div class="syntax-card">
+            <div class="syntax-badge">*</div>
+            <h4>Multiplicación Explícita</h4>
+            <p>Escribe siempre el asterisco entre coeficientes y variables (evita <code>2x</code>).</p>
+            <div class="syntax-example"><code>2*x + 5*sin(x)</code></div>
+          </div>
+      
+          <div class="syntax-card">
+            <div class="syntax-badge">sqrt()</div>
+            <h4>Raíces Cuadradas</h4>
+            <p>Encierra entre paréntesis toda la expresión que va dentro de la raíz.</p>
+            <div class="syntax-example"><code>sqrt(x + 4)</code></div>
+          </div>
+      
+          <div class="syntax-card">
+            <div class="syntax-badge">sin / cos</div>
+            <h4>Trigonométricas</h4>
+            <p>Usa <code>sin(x)</code>, <code>cos(x)</code> y <code>tan(x)</code>. Todos los ángulos se evalúan en radianes.</p>
+            <div class="syntax-example"><code>cos(x) - x</code></div>
+          </div>
+      
+          <div class="syntax-card">
+            <div class="syntax-badge">exp()</div>
+            <h4>Exponenciales</h4>
+            <p>Utiliza <code>exp(x)</code> para representar la constante de Euler elevada a una potencia ($e^x$).</p>
+            <div class="syntax-example"><code>exp(-x) - x</code></div>
+          </div>
+      
+          <div class="syntax-card">
+            <div class="syntax-badge">( )</div>
+            <h4>Agrupación</h4>
+            <p>Usa paréntesis para definir jerarquía en fracciones y argumentos compuestos.</p>
+            <div class="syntax-example"><code>(x^2 - 1)/(x + 3)</code></div>
+          </div>
+        </div>
+      
+        <div class="tip-banner">
+          <strong>Consejo:</strong> También puedes usar el <strong>teclado matemático rápido</strong> incluido arriba del campo de función en cada método de la Unidad 2.
+        </div>
       </div>
-  
-      <!-- VISTA CRÉDITOS -->
-      <div id="vista-creditos" class="vista-metodo hidden">
-        <section class="card theory-card">
-          <h2>Créditos del Proyecto</h2>
-          <ul>
-            <li><strong>Equipo:</strong> Equipo de Desarrollo de NUMERICA</li>
-            <li><strong>Desarrolladores:</strong>
-              <ul>
-                <li>De Aquino Cordero Carlos Leonardo</li>
-                <li>Franco Oropeza Aurora Josselinne</li>
-                <li>Martinez Carmona Nicolas</li>
-                <li>Silva Chavez Lizeth Nayeli</li>
-              </ul>
-            </li>
-            <li><strong>Materia:</strong> Métodos Numéricos I</li>
-            <li><strong>Profesor:</strong> Mtro. Curiel García Carlos Pedro</li>
-            <li><strong>Institución:</strong> Universidad Nacional Autónoma de México - Facultad de Estudios Superiores Acatlán</li>
-            <li><strong>Licenciatura:</strong> Matemáticas Aplicadas y Computación</li>
-            <li><strong>Tecnologías:</strong> HTML5, CSS3, JavaScript, C++, WebAssembly (Emscripten)</li>
-          </ul>
+
+    <!-- VISTA CRÉDITOS -->
+    <div id="vista-creditos" class="vista-metodo hidden">
+      <section class="hero-card credits-hero">
+        <div class="hero-badge">UNAM • FES Acatlán</div>
+        <h2>Créditos del Proyecto</h2>
+        <p>Proyecto académico desarrollado para la asignatura de <strong>Métodos Numéricos I</strong> de la Licenciatura en Matemáticas Aplicadas y Computación.</p>
+      </section>
+    
+      <div class="credits-layout">
+        <!-- Columna Desarrolladores -->
+        <section class="card">
+          <h3 class="card-heading">Equipo de Desarrollo</h3>
+          <div class="dev-grid">
+            <div class="dev-card">
+              <div class="dev-avatar">DA</div>
+              <div>
+                <strong>De Aquino Cordero Carlos Leonardo</strong>
+                <span>Desarrollador</span>
+              </div>
+            </div>
+            <div class="dev-card">
+              <div class="dev-avatar">FO</div>
+              <div>
+                <strong>Franco Oropeza Aurora Josselinne</strong>
+                <span>Desarrolladora</span>
+              </div>
+            </div>
+            <div class="dev-card">
+              <div class="dev-avatar">MC</div>
+              <div>
+                <strong>Martínez Carmona Nicolás</strong>
+                <span>Desarrollador</span>
+              </div>
+            </div>
+            <div class="dev-card">
+              <div class="dev-avatar">SC</div>
+              <div>
+                <strong>Silva Chávez Lizeth Nayeli</strong>
+                <span>Desarrolladora</span>
+              </div>
+            </div>
+          </div>
         </section>
+    
+        <!-- Columna Información Académica y Tecnologías -->
+        <div class="credits-side">
+          <section class="card">
+            <h3 class="card-heading">Información Académica</h3>
+            <div class="info-list">
+              <div class="info-row"><span>Institución</span><strong>UNAM - FES Acatlán</strong></div>
+              <div class="info-row"><span>Licenciatura</span><strong>Matemáticas Aplicadas y Computación</strong></div>
+              <div class="info-row"><span>Materia</span><strong>Métodos Numéricos I</strong></div>
+              <div class="info-row"><span>Profesor</span><strong>Mtro. Curiel García Carlos Pedro</strong></div>
+            </div>
+          </section>
+    
+          <section class="card">
+            <h3 class="card-heading">Stack Tecnológico</h3>
+            <div class="tech-pills">
+              <span class="tech-pill">C++</span>
+              <span class="tech-pill">WebAssembly (Emscripten)</span>
+              <span class="tech-pill">HTML5</span>
+              <span class="tech-pill">CSS3</span>
+              <span class="tech-pill">JavaScript</span>
+              <span class="tech-pill">MathJax</span>
+            </div>
+          </section>
+        </div>
       </div>
-    </main> 
-  </div>
+</div>
 
   <!-- ========================================== -->
   <!-- UNIDAD 2: RAÍCES                           -->
