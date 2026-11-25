@@ -59,13 +59,57 @@
     <main class="content-area">
       <!-- VISTA BIENVENIDA -->
       <div id="vista-bienvenida" class="vista-metodo">
-        <section class="card theory-card">
-          <h2>Bienvenido a Numérica</h2>
-          <p>Numérica es una calculadora avanzada para la resolución de métodos numéricos. Su motor de cálculo está desarrollado en <strong>C++</strong> y ejecutado en el navegador mediante <strong>WebAssembly</strong>, garantizando velocidad y precisión computacional.</p>
-          <p>Selecciona una unidad en el menú superior para comenzar a resolver raíces de funciones, sistemas de ecuaciones lineales, factorización de matrices y valores propios.</p>
+        
+        <!-- Banner Principal (Hero) -->
+        <section class="hero-card">
+          <div class="hero-badge">Motor C++ & WebAssembly</div>
+          <h2>Bienvenido a <span class="highlight-text">NUMÉRICA</span></h2>
+          <p>Plataforma de cálculo científico para la resolución paso a paso de métodos numéricos con precisión y velocidad nativa en el navegador.</p>
+          <div class="hero-stats">
+            <div class="stat-item"><strong>4</strong><span>Unidades</span></div>
+            <div class="stat-item"><strong>10</strong><span>Métodos</span></div>
+            <div class="stat-item"><strong>C++</strong><span>Motor WASM</span></div>
+          </div>
         </section>
+      
+        <!-- Cuadrícula de Accesos Directos -->
+        <h3 class="section-subtitle">Explorar Unidades</h3>
+        <div class="units-grid">
+          
+          <div class="unit-card" onclick="document.querySelector('.top-nav button:nth-child(2)').click()">
+            <div class="unit-icon">f(x)</div>
+            <div class="unit-tag">Unidad 2</div>
+            <h4>Búsqueda de Raíces</h4>
+            <p>Encuentra ceros de ecuaciones no lineales mediante Bisección, Newton-Raphson y Secante.</p>
+            <span class="unit-link">Abrir calculadora →</span>
+          </div>
+      
+          <div class="unit-card" onclick="document.querySelector('.top-nav button:nth-child(3)').click()">
+            <div class="unit-icon">[A]</div>
+            <div class="unit-tag">Unidad 3</div>
+            <h4>Sistemas Lineales</h4>
+            <p>Resuelve sistemas $Ax = b$ con métodos directos e iterativos: Gauss-Jordan, Jacobi y Gauss-Seidel.</p>
+            <span class="unit-link">Abrir calculadora →</span>
+          </div>
+      
+          <div class="unit-card" onclick="document.querySelector('.top-nav button:nth-child(4)').click()">
+            <div class="unit-icon">LU</div>
+            <div class="unit-tag">Unidad 4</div>
+            <h4>Factorización LU</h4>
+            <p>Descomposición matricial triangular mediante los algoritmos de Doolittle y Crout.</p>
+            <span class="unit-link">Abrir calculadora →</span>
+          </div>
+      
+          <div class="unit-card" onclick="document.querySelector('.top-nav button:nth-child(5)').click()">
+            <div class="unit-icon">λ</div>
+            <div class="unit-tag">Unidad 5</div>
+            <h4>Valores Propios</h4>
+            <p>Calcula eigenvalores dominantes y mínimos junto con sus vectores propios por Potencia.</p>
+            <span class="unit-link">Abrir calculadora →</span>
+          </div>
+      
+        </div>
       </div>
-  
       <!-- VISTA GUÍA DE USO -->
       <div id="vista-guia" class="vista-metodo hidden">
         <section class="card theory-card">
