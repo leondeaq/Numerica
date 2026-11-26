@@ -1033,3 +1033,22 @@ body {
   background: #2563eb;
   transform: translateY(-2px);
 }
+
+/* Vectores columna dentro de las tablas de Potencia / Potencia Inversa */
+.tabla-potencia td {
+  vertical-align: middle;
+}
+
+.vec-col {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: monospace;
+  font-size: 0.92em;
+  line-height: 1.5;
+  padding: 4px 10px;
+  border-left: 2px solid #adb5bd;
+  border-right: 2px solid #adb5bd;
+  border-radius: 4px;
+  background-color: #fcfcfc;
+}
