@@ -528,27 +528,11 @@
             </div>
           </div>
 
-          <!-- Unidad 3 y 4: Sistemas de Ecuaciones Lineales -->
-          <div class="ejemplos-bar">
-            <span class="ejemplos-label">Ejemplos rápidos:</span>
-            <button type="button" class="btn-ejemplo" onclick="cargarEjemploU3('diag3x3')">
-              Sistema 3×3
-            </button>
-            <button type="button" class="btn-ejemplo" onclick="cargarEjemploU3('sistema4x4')">
-              Sistema 4×4
-            </button>
+         <div class="ejemplos-row">
+            <button type="button" class="btn btn-secondary" onclick="cargarEjemploMatricial('valido')">Cargar Ejemplo</button>
+            <button type="button" class="btn btn-secondary" onclick="cargarEjemploMatricial('falla')">Cargar Contraejemplo</button>
           </div>
-          
-          <!-- Unidad 5: Valores y Vectores Propios (Potencia y Potencia Inversa) -->
-          <div class="ejemplos-bar">
-            <span class="ejemplos-label">Ejemplos rápidos:</span>
-            <button type="button" class="btn-ejemplo" onclick="cargarEjemploU5('simetrica3x3')">
-              Matriz 3×3 (λ=4, λ=1)
-            </button>
-            <button type="button" class="btn-ejemplo" onclick="cargarEjemploU5('matriz2x2')">
-              Matriz 2×2 básica
-            </button>
-          </div>
+
           <button type="submit" class="btn btn-primary btn-block mt-3">Ejecutar Método</button>
         </form>
       </section>
