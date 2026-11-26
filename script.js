@@ -802,3 +802,26 @@ function cargarEjemploMatricial(tipo) {
     }
   }
 }
+
+// ==========================================
+// SELECTOR DE TEMA VISUAL (CLARO / LUJO / UNAM)
+// ==========================================
+function cambiarTema(tema) {
+  if (tema === 'claro') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', tema);
+  }
+
+  localStorage.setItem('numerica-tema', tema);
+
+  document.querySelectorAll('.theme-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.setTheme === tema);
+  });
+}
+
+// Aplicar tema guardado al cargar la aplicación
+document.addEventListener('DOMContentLoaded', () => {
+  const temaGuardado = localStorage.getItem('numerica-tema') || 'claro';
+  cambiarTema(temaGuardado);
+});
