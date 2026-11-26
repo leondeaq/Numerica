@@ -1396,6 +1396,7 @@ ResultadoPotenciaInversa calcular_potencia_inversa_cpp(vector<vector<double>> A,
     double lambda_ant = 0;
 
     for (int k = 1; k <= max_iter; k++) {
+        vector<double> x_actual = vk; // Guardar Xn antes de actualizar
 
         // En vez de multiplicar por A^-1, se resuelve A * y = vk
         vector<double> y;
@@ -1429,13 +1430,11 @@ ResultadoPotenciaInversa calcular_potencia_inversa_cpp(vector<vector<double>> A,
             vk[i] = y[i] / mu;
         }
 
-        // Dentro del ciclo for (int k = 1; k <= max_iter; k++) de calcular_potencia_inversa_cpp:
-        // Antes de normalizar 'x', guarda: vector<double> x_actual = x;
-        // Después de resolver A * y = x_actual, calcular 'mayor' (Cn) y normalizar x[i] = y[i] / mayor:
-        double lambda_inv = 1.0 / mayor; // lmin como en el Excel
-        double error = (k > 1) ? fabs(lambda_inv - anterior) : 0.0;
+        double error = 0;
+        if (k > 1) error = fabs(lambda_k - lambda_ant);
 
-        res.tabla.push_back({k - 1, x_actual, y, mayor, x, lambda_inv, error});
+        // Registrar fila completa: n = k - 1, Xn, Yn, Cn = mu, Xn+1 = vk, lambda_k, error
+        res.tabla.push_back({k - 1, x_actual, y, mu, vk, lambda_k, error});
 
         res.lambda_min = lambda_k;
         res.v_propio = vk;
