@@ -524,6 +524,78 @@ function renderMatricial(res) {
   }
 
   // ==========================================
+  // TABLAS ITERATIVAS (Potencia y Potencia Inversa - U5)
+  // ==========================================
+  if (res.tabla && (metodoActivo === 'potencia' || metodoActivo === 'potenciainversa')) {
+    const esInversa = (metodoActivo === 'potenciainversa');
+    const numIters = res.tabla.size();
+    const eigenVal = esInversa ? res.lambda_min : res.lambda_max;
+    const tituloEigen = esInversa ? 'Eigenvalor mínimo (λmin)' : 'Eigenvalor dominante (λmax)';
+
+    // Helper para formatear un vector columna verticalmente (como en Excel)
+    const fmtVecCol = (vec) => {
+      let out = '<div class="vec-col">';
+      for (let i = 0; i < vec.size(); i++) {
+        out += `<span>${vec.get(i).toFixed(6)}</span>`;
+      }
+      out += '</div>';
+      return out;
+    };
+
+    // 1. Tarjetas superiores de resumen
+    html += `
+    <div class="results-cards-container" style="display: flex; gap: 20px; margin-bottom: 20px;">
+      <div class="result-card" style="flex: 1; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f8f9fa;">
+        <h4 style="margin: 0 0 8px 0; color: #333; font-size: 14px;">${tituloEigen}</h4>
+        <div style="font-size: 18px; font-weight: bold; color: #0d6efd;">${eigenVal.toFixed(6)}</div>
+      </div>
+      <div class="result-card" style="flex: 1; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f8f9fa;">
+        <h4 style="margin: 0 0 8px 0; color: #333; font-size: 14px;">Iteraciones</h4>
+        <div style="font-size: 18px; font-weight: bold; color: #0d6efd;">${res.iteraciones}</div>
+      </div>
+    </div>`;
+
+    // 2. Tabla de iteraciones
+    html += `
+    <div class="table-container" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: auto; margin-bottom: 20px;">
+      <table class="results-table tabla-potencia" style="width: 100%; border-collapse: collapse; text-align: center;">
+        <thead style="background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0;">
+          <tr>
+            <th style="padding: 10px;">n</th>
+            <th style="padding: 10px;">X<sub>n</sub></th>
+            <th style="padding: 10px;">Y<sub>n</sub> = ${esInversa ? 'A⁻¹·X<sub>n</sub>' : 'A·X<sub>n</sub>'}</th>
+            <th style="padding: 10px;">C<sub>n</sub></th>
+            ${esInversa ? '<th style="padding: 10px;">λ<sub>min</sub> (1/C<sub>n</sub>)</th>' : '<th style="padding: 10px;">X<sub>n+1</sub></th>'}
+            ${esInversa ? '<th style="padding: 10px;">X<sub>n+1</sub></th>' : '<th style="padding: 10px;">λ<sub>k</sub></th>'}
+            <th style="padding: 10px;">Error</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+    for (let i = 0; i < numIters; i++) {
+      const fila = res.tabla.get(i);
+      const errTxt = (i === 0) ? '-' : fila.error.toExponential(4);
+
+      html += `
+        <tr style="border-bottom: 1px solid #e9ecef;">
+          <td style="padding: 10px; font-weight: bold;">${fila.k}</td>
+          <td style="padding: 10px;">${fmtVecCol(fila.xn)}</td>
+          <td style="padding: 10px;">${fmtVecCol(fila.yn)}</td>
+          <td style="padding: 10px; font-weight: bold; color: #0d6efd;">${fila.cn.toFixed(6)}</td>
+          ${esInversa
+            ? `<td style="padding: 10px; font-weight: bold; color: #198754;">${fila.lambda_k.toFixed(6)}</td>
+               <td style="padding: 10px;">${fmtVecCol(fila.x_next)}</td>`
+            : `<td style="padding: 10px;">${fmtVecCol(fila.x_next)}</td>
+               <td style="padding: 10px; font-weight: bold; color: #198754;">${fila.lambda_k.toFixed(6)}</td>`
+          }
+          <td style="padding: 10px;">${errTxt}</td>
+        </tr>`;
+    }
+
+    html += `</tbody></table></div>`;
+  }
+
+  // ==========================================
   // MOSTRAR VECTORES FINALES
   // ==========================================
   let vecSol = res.x || res.x_solucion || res.v_propio;
