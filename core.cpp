@@ -1186,8 +1186,12 @@ ResultadoCrout calcular_crout_cpp(vector<vector<double>> A, vector<double> b) {
 // Fila de la tabla (compartida por Potencia y Potencia Inversa)
 struct FilaPotencia {
     int k;
-    double lambda_k;
-    double error;   // En la iteración 1 vale 0 (aún no hay valor previo)
+    vector<double> xn;      // Vector Xn de entrada
+    vector<double> yn;      // Vector Yn = A*Xn (o B*Xn en inversa)
+    double cn;              // Factor de normalización Cn (mayor en valor absoluto)
+    vector<double> x_next;  // Vector normalizado Xn+1 = Yn / Cn
+    double lambda_k;        // Aproximación del eigenvalor (λmax o λmin)
+    double error;           // En la iteración 1 vale 0
 };
 
 // -------------------------- MÉTODO DE LA POTENCIA ---------------------------
@@ -1233,19 +1237,18 @@ ResultadoPotencia calcular_potencia_cpp(vector<vector<double>> A, vector<double>
     double anterior = 0;
 
     for (int k = 1; k <= max_iter; k++) {
+        vector<double> x_actual = x; // Guardar Xn antes de actualizar
 
         // y = A * x
         for (int i = 0; i < n; i++) {
             y[i] = 0;
-
             for (int j = 0; j < n; j++) {
                 y[i] += A[i][j] * x[j];
             }
         }
 
-        // Componente de mayor valor absoluto
+        // Componente de mayor valor absoluto (Cn)
         double mayor = 0;
-
         for (int i = 0; i < n; i++) {
             if (fabs(y[i]) > mayor) mayor = fabs(y[i]);
         }
@@ -1255,34 +1258,31 @@ ResultadoPotencia calcular_potencia_cpp(vector<vector<double>> A, vector<double>
             return res;
         }
 
-        // Normalizar para evitar desbordamientos
+        // Normalizar: Xn+1 = Yn / Cn
         for (int i = 0; i < n; i++) {
             x[i] = y[i] / mayor;
         }
 
         // Cociente de Rayleigh: lambda = (x·Ax) / (x·x)
+        vector<double> ax(n, 0.0);
         for (int i = 0; i < n; i++) {
-            y[i] = 0;
-
             for (int j = 0; j < n; j++) {
-                y[i] += A[i][j] * x[j];
+                ax[i] += A[i][j] * x[j];
             }
         }
 
-        double numerador = 0;
-        double denominador = 0;
-
+        double numerador = 0, denominador = 0;
         for (int i = 0; i < n; i++) {
-            numerador += x[i] * y[i];
+            numerador += x[i] * ax[i];
             denominador += x[i] * x[i];
         }
 
         lambda = numerador / denominador;
 
-        double error = 0;
-        if (k > 1) error = fabs(lambda - anterior);
+        double error = (k > 1) ? fabs(lambda - anterior) : 0.0;
 
-        res.tabla.push_back({k, lambda, error});
+        // Guardar fila completa (k-1 para que coincida con n = 0, 1, 2... del Excel)
+        res.tabla.push_back({k - 1, x_actual, y, mayor, x, lambda, error});
 
         res.lambda_max = lambda;
         res.v_propio = x;
@@ -1295,7 +1295,7 @@ ResultadoPotencia calcular_potencia_cpp(vector<vector<double>> A, vector<double>
 
         anterior = lambda;
     }
-
+    
     res.error_msg = "No se alcanzó la tolerancia en el máximo de iteraciones.";
     return res;
 }
@@ -1429,10 +1429,13 @@ ResultadoPotenciaInversa calcular_potencia_inversa_cpp(vector<vector<double>> A,
             vk[i] = y[i] / mu;
         }
 
-        double error = 0;
-        if (k > 1) error = fabs(lambda_k - lambda_ant);
+        // Dentro del ciclo for (int k = 1; k <= max_iter; k++) de calcular_potencia_inversa_cpp:
+        // Antes de normalizar 'x', guarda: vector<double> x_actual = x;
+        // Después de resolver A * y = x_actual, calcular 'mayor' (Cn) y normalizar x[i] = y[i] / mayor:
+        double lambda_inv = 1.0 / mayor; // lmin como en el Excel
+        double error = (k > 1) ? fabs(lambda_inv - anterior) : 0.0;
 
-        res.tabla.push_back({k, lambda_k, error});
+        res.tabla.push_back({k - 1, x_actual, y, mayor, x, lambda_inv, error});
 
         res.lambda_min = lambda_k;
         res.v_propio = vk;
@@ -1594,6 +1597,10 @@ EMSCRIPTEN_BINDINGS(modulo_metodos) {
     // Fila compartida por Potencia y Potencia Inversa
     value_object<FilaPotencia>("FilaPotencia")
         .field("k", &FilaPotencia::k)
+        .field("xn", &FilaPotencia::xn)
+        .field("yn", &FilaPotencia::yn)
+        .field("cn", &FilaPotencia::cn)
+        .field("x_next", &FilaPotencia::x_next)
         .field("lambda_k", &FilaPotencia::lambda_k)
         .field("error", &FilaPotencia::error);
 
