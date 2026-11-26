@@ -728,6 +728,7 @@ function aplicarDatosMatriciales(n, A, b, x0 = null, tol = 0.0001) {
 }
 
 function cargarEjemploMatricial(tipo) {
+  // UNIDAD 3: Gauss-Jordan
   if (metodoActivo === 'gaussjordan') {
     if (tipo === 'valido') {
       aplicarDatosMatriciales(3, [
@@ -743,6 +744,7 @@ function cargarEjemploMatricial(tipo) {
       ], [6, 12, 3]);
     }
   }
+  // UNIDAD 3: Jacobi y Gauss-Seidel
   else if (metodoActivo === 'jacobi' || metodoActivo === 'gaussseidel') {
     if (tipo === 'valido') {
       aplicarDatosMatriciales(3, [
@@ -758,6 +760,7 @@ function cargarEjemploMatricial(tipo) {
       ], [10, 10, 10], [0, 0, 0], 0.0001);
     }
   }
+  // UNIDAD 4: Factorización LU (Doolittle y Crout)
   else if (metodoActivo === 'doolittle' || metodoActivo === 'crout') {
     if (tipo === 'valido') {
       aplicarDatosMatriciales(3, [
@@ -773,6 +776,7 @@ function cargarEjemploMatricial(tipo) {
       ], [5, -6, 3]);
     }
   }
+  // UNIDAD 5: Potencia y Potencia Inversa
   else if (metodoActivo === 'potencia' || metodoActivo === 'potenciainversa') {
     if (tipo === 'valido') {
       const x0Ref = (metodoActivo === 'potencia') ? [1, 1, 1] : [1, 0, 0];
