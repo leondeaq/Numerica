@@ -201,7 +201,6 @@ body {
   border-radius: 4px;
 }
 
-/* Selector de Tema (Pill Switcher) */
 .theme-switcher {
   display: inline-flex;
   align-items: center;
@@ -335,6 +334,7 @@ body {
   flex: 1;
   padding: 1.5rem;
   max-width: 1100px;
+  min-width: 0;
 }
 
 /* ==========================================================================
@@ -564,7 +564,7 @@ body {
 }
 
 /* ==========================================================================
-   7. MÉTRICAS, TABLAS Y RESULTADOS
+   7. MÉTRICAS, TABLAS, VECTORES Y MATRICES L / U RESPONSIVAS
    ========================================================================== */
 .metrics-grid {
   display: grid;
@@ -580,6 +580,7 @@ body {
   padding: 1rem;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .metric-title {
@@ -599,14 +600,14 @@ body {
   grid-column: span 1;
 }
 
+/* Mantiene filas verticales si hay varias líneas y permite scroll horizontal seguro */
 .matrix-bracket-small {
   position: relative;
-  display: inline-flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px 10px;
+  display: inline-block;
   max-width: 100%;
-  padding: 0 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px 14px;
   margin-top: 0.5rem;
   font-family: monospace;
   font-size: 0.9rem;
@@ -618,16 +619,90 @@ body {
 .matrix-bracket-small::after {
   content: "";
   position: absolute;
-  top: 0; bottom: 0;
+  top: 0;
+  bottom: 0;
   width: 6px;
-  border: 2px solid var(--text-muted);
+  border: 2px solid var(--secondary-color);
 }
 .matrix-bracket-small::before { left: 0; border-right: none; }
 .matrix-bracket-small::after { right: 0; border-left: none; }
 
+.vector-inline-wrap {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 12px;
+}
+
 .matrix-bracket-small .vector-val {
   display: inline-block;
-  padding: 2px 4px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+/* Contenedor responsivo para Matriz L y Matriz U */
+.lu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.lu-card {
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1rem;
+  min-width: 0;
+}
+
+.lu-card-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.lu-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 4px;
+}
+
+.lu-bracket-box {
+  position: relative;
+  display: inline-block;
+  padding: 6px 12px;
+  margin: auto;
+}
+
+.lu-bracket-box::before,
+.lu-bracket-box::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  border: 2px solid var(--primary-color);
+}
+.lu-bracket-box::before { left: 0; border-right: none; }
+.lu-bracket-box::after { right: 0; border-left: none; }
+
+.lu-table {
+  border-collapse: collapse;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.lu-table td {
+  padding: 5px 10px;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .table-container {
@@ -1057,7 +1132,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #ffffff; /* Se mantiene blanco para garantizar lectura del QR en modo oscuro */
+  background: #ffffff;
   border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 10px;
@@ -1147,7 +1222,6 @@ body {
     overflow-x: hidden;
   }
 
-  /* Evita el zoom automático en iOS */
   .form-group input,
   .matrix-input,
   select {
@@ -1200,6 +1274,22 @@ body {
   .repo-content {
     flex-direction: column;
     text-align: center;
+  }
+
+  .lu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lu-scroll {
+    justify-content: flex-start;
+  }
+
+  .lu-table {
+    font-size: 0.82rem;
+  }
+
+  .lu-table td {
+    padding: 4px 7px;
   }
 }
 
@@ -1254,7 +1344,7 @@ body {
   font-weight: 700;
 }
 
-/* Respaldo automático para cualquier tabla con fondo blanco fijo en Modo Platino */
+/* Respaldo automático para tablas con fondo fijo en Modo Lujo (sin pintar última col. de L/U) */
 [data-theme="lujo"] #salidaMatricial table,
 [data-theme="lujo"] #salidaMatricial td,
 [data-theme="lujo"] #salidaMatricial th {
@@ -1263,7 +1353,7 @@ body {
   border-color: var(--border-color) !important;
 }
 
-[data-theme="lujo"] #salidaMatricial td:last-child {
+[data-theme="lujo"] #salidaMatricial .gj-matrix-table td.gj-col-b {
   background-color: var(--accent-light) !important;
   color: var(--accent-color) !important;
 }
