@@ -699,3 +699,102 @@ function cargarEjemploU2(metodo, tipo) {
     document.getElementById('iter_sec').value = 100;
   }
 }
+
+// ==========================================
+// 7. EJEMPLOS Y CONTRAEJEMPLOS (UNIDADES 3, 4 Y 5)
+// ==========================================
+function aplicarDatosMatriciales(n, A, b, x0 = null, tol = 0.0001) {
+  const inputN = document.getElementById('dimN');
+  const inputTol = document.getElementById('tolMat');
+
+  inputN.value = n;
+  if (inputTol) inputTol.value = tol;
+
+  generarGrillas();
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      const cellA = document.getElementById(`A_${i}_${j}`);
+      if (cellA) cellA.value = A[i][j];
+    }
+    const cellB = document.getElementById(`B_${i}`);
+    if (cellB) cellB.value = b[i];
+
+    if (x0) {
+      const cellX0 = document.getElementById(`vecX0_${i}`);
+      if (cellX0) cellX0.value = x0[i];
+    }
+  }
+}
+
+function cargarEjemploMatricial(tipo) {
+  if (metodoActivo === 'gaussjordan') {
+    if (tipo === 'valido') {
+      aplicarDatosMatriciales(3, [
+        [ 2,  1, -1],
+        [-3, -1,  2],
+        [-2,  1,  2]
+      ], [8, -11, -3]);
+    } else {
+      aplicarDatosMatriciales(3, [
+        [1, 2, 3],
+        [2, 4, 6],
+        [1, 1, 1]
+      ], [6, 12, 3]);
+    }
+  }
+  else if (metodoActivo === 'jacobi' || metodoActivo === 'gaussseidel') {
+    if (tipo === 'valido') {
+      aplicarDatosMatriciales(3, [
+        [10, -1,  2],
+        [-1, 11, -1],
+        [ 2, -1, 10]
+      ], [6, 25, -11], [0, 0, 0], 0.0001);
+    } else {
+      aplicarDatosMatriciales(3, [
+        [1, 5, 4],
+        [4, 1, 5],
+        [5, 4, 1]
+      ], [10, 10, 10], [0, 0, 0], 0.0001);
+    }
+  }
+  else if (metodoActivo === 'doolittle' || metodoActivo === 'crout') {
+    if (tipo === 'valido') {
+      aplicarDatosMatriciales(3, [
+        [ 4, -1,  1],
+        [-1,  4, -2],
+        [ 1, -2,  4]
+      ], [12, -1, 5]);
+    } else {
+      aplicarDatosMatriciales(3, [
+        [ 0,  2,  1],
+        [ 1, -2, -3],
+        [-1,  1,  2]
+      ], [5, -6, 3]);
+    }
+  }
+  else if (metodoActivo === 'potencia' || metodoActivo === 'potenciainversa') {
+    if (tipo === 'valido') {
+      const x0Ref = (metodoActivo === 'potencia') ? [1, 1, 1] : [1, 0, 0];
+      aplicarDatosMatriciales(3, [
+        [ 3, -1,  0],
+        [-1,  2, -1],
+        [ 0, -1,  3]
+      ], x0Ref, null, 0.0001);
+    } else {
+      if (metodoActivo === 'potencia') {
+        aplicarDatosMatriciales(3, [
+          [ 3, -1,  0],
+          [-1,  2, -1],
+          [ 0, -1,  3]
+        ], [0, 0, 0], null, 0.0001);
+      } else {
+        aplicarDatosMatriciales(3, [
+          [1, 2, 3],
+          [2, 4, 6],
+          [3, 6, 9]
+        ], [1, 1, 1], null, 0.0001);
+      }
+    }
+  }
+}
