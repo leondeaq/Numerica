@@ -496,31 +496,34 @@ function renderMatricial(res) {
   // MOSTRAR MATRICES L Y U (Para Unidad 4)
   // ==========================================
   if (res.L && res.U) {
-    html += `<div style="display: flex; gap: 40px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">`;
-    
-    html += `<div><h4>Matriz L</h4><div class="matrix-bracket-small" style="text-align: center; padding: 10px;">`;
-    for (let i = 0; i < res.L.size(); i++) {
-      let row = res.L.get(i);
-      html += `<div>`;
-      for (let j = 0; j < row.size(); j++) {
-        html += `<span class="vector-val" style="display:inline-block; width:65px; text-align:right; margin: 0 5px;">${row.get(j).toFixed(4)}</span>`;
+    const construirMatrizLU = (titulo, mat) => {
+      let filasHtml = '';
+      for (let i = 0; i < mat.size(); i++) {
+        const row = mat.get(i);
+        filasHtml += '<tr>';
+        for (let j = 0; j < row.size(); j++) {
+          filasHtml += `<td>${row.get(j).toFixed(4)}</td>`;
+        }
+        filasHtml += '</tr>';
       }
-      html += `</div>`;
-    }
-    html += `</div></div>`;
+      return `
+        <div class="lu-card">
+          <div class="lu-card-title">${titulo}</div>
+          <div class="lu-scroll">
+            <div class="lu-bracket-box">
+              <table class="lu-table"><tbody>${filasHtml}</tbody></table>
+            </div>
+          </div>
+        </div>
+      `;
+    };
 
-    html += `<div><h4>Matriz U</h4><div class="matrix-bracket-small" style="text-align: center; padding: 10px;">`;
-    for (let i = 0; i < res.U.size(); i++) {
-      let row = res.U.get(i);
-      html += `<div>`;
-      for (let j = 0; j < row.size(); j++) {
-        html += `<span class="vector-val" style="display:inline-block; width:65px; text-align:right; margin: 0 5px;">${row.get(j).toFixed(4)}</span>`;
-      }
-      html += `</div>`;
-    }
-    html += `</div></div>`;
-    
-    html += `</div>`;
+    html += `
+      <div class="lu-grid">
+        ${construirMatrizLU('Matriz Triangular Inferior (L)', res.L)}
+        ${construirMatrizLU('Matriz Triangular Superior (U)', res.U)}
+      </div>
+    `;
   }
 
   // ==========================================
